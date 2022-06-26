@@ -21,15 +21,18 @@ def get_version(path):
 setuptools.setup(
     name='evidence-features',
     version=get_version("evidence-features/__init__.py"),
-    description='lorem ipsum',
-    long_description=read('README.rst'),
+    description=(
+        "Linguistic feature extraction for German (lang: de) as 8-bit interger"
+        " representations."
+    ),
+    long_description=read('README.md'),  # README.rst
     url='http://github.com/satzbeleg/evidence-features',
     author='Ulf Hamster',
     author_email='554c46@gmail.com',
     license='Apache License 2.0',
-    packages=['evidence-features'],
+    packages=['evidence_features'],
     install_requires=[],
     # scripts=['scripts/examplescript.py'],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     zip_safe=True
 )
