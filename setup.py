@@ -19,15 +19,15 @@ def get_version(path):
 
 
 setuptools.setup(
-    name='template_pypi',
-    version=get_version("template_pypi/__init__.py"),
+    name='evidence-features',
+    version=get_version("evidence-features/__init__.py"),
     description='lorem ipsum',
     long_description=read('README.rst'),
-    url='http://github.com/myorg/template_pypi',
-    author='John Doe',
+    url='http://github.com/satzbeleg/evidence-features',
+    author='Ulf Hamster',
     author_email='554c46@gmail.com',
     license='Apache License 2.0',
-    packages=['template_pypi'],
+    packages=['evidence-features'],
     install_requires=[],
     # scripts=['scripts/examplescript.py'],
     python_requires='>=3.6',

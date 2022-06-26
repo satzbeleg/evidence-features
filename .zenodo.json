@@ -3,12 +3,12 @@
     "name": "Ulf Hamster",
     "orcid": "0000-0002-0440-4868"
   }],
-  "title": "template_pypi: Lorem Ipsum",
-  "description": "Lorem Ipsum.",
+  "title": "evidence-features: Linguistic feature extraction",
+  "description": "Linguistic feature extraction",
   "license": "Apache-2.0",
   "upload_type": "software",
   "keywords": [
-    "keyword 1",
-    "keyword 2"
+    "linguistic annotation",
+    "feature engineering"
   ]
 }
