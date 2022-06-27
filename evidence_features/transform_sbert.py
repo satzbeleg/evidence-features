@@ -12,8 +12,10 @@ model_sbert = sbert.SentenceTransformer(
     cache_folder=MODELPATH
 )
 
+
 def sbert_to_float(sentences: List[str]):
     return model_sbert.encode(sentences)
+
 
 def sbert_to_int8(sentences: List[str]):
     pass

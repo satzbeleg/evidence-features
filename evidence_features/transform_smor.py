@@ -4,6 +4,7 @@ import re
 import string
 import numpy as np
 from typing import List
+from .utils import divide_by_1st_col
 
 # path to the pretrained SMOR model
 MODELPATH = os.getenv("MODELFOLDER", "./models")
@@ -24,15 +25,18 @@ def get_morphology_stats(word):
         lexemes = [t for t in s.split("\t") if len(t) > 0]
         key = "+".join(lexemes)
         variants[key] = lexemes
-    num_usecases = len(res)  # syntactial ambivalence
-    num_splittings = len(variants)  # lexeme ambivalence
-    max_lexemes = max([len(lexemes) for lexemes in variants.values()])  # working memory for composita comprehension
+    # syntactial ambivalence
+    num_usecases = len(res)
+    # lexeme ambivalence
+    num_splittings = len(variants)
+    # working memory for composita comprehension
+    max_lexemes = max([len(lexemes) for lexemes in variants.values()])
     return num_usecases, num_splittings, max_lexemes
 
 
 def simple_tokenizer(sinp):
     chars = re.escape(string.punctuation)
-    s = re.sub(r'['+chars+' ]', '\t', sinp)
+    s = re.sub(r'[' + chars + ' ]', '\t', sinp)
     tokens = [re.sub('[^a-zA-Z0-9]', '', t) for t in s.split('\t')]
     tokens = [t for t in tokens if len(t) > 0]
     return tokens
@@ -75,12 +79,9 @@ def get_morphology_distributions(sent):
 
 def smor_to_float(sentences: List[str]):
     feats1, feats2, feats3 = smor_to_int8(sentences)
-    n_feats1 = feats1.shape[-1] - 1
-    out1 = feats1[:, 1:] / np.tile(feats1[:, 0].reshape(-1, 1), n_feats1)
-    n_feats2 = feats2.shape[-1] - 1
-    out2 = feats2[:, 1:] / np.tile(feats2[:, 0].reshape(-1, 1), n_feats2)
-    n_feats3 = feats3.shape[-1] - 1
-    out3 = feats3[:, 1:] / np.tile(feats3[:, 0].reshape(-1, 1), n_feats3)
+    out1 = divide_by_1st_col(feats1)
+    out2 = divide_by_1st_col(feats2)
+    out3 = divide_by_1st_col(feats3)
     return out1, out2, out3
 
 

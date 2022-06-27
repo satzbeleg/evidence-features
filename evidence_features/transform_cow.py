@@ -5,6 +5,7 @@ import numpy as np
 import gc
 from typing import List
 import json
+from .utils import divide_by_1st_col
 
 # path to the COW datasets
 MODELPATH = os.getenv("MODELFOLDER", "./models")
@@ -33,14 +34,13 @@ else:
 
 
 brackets = np.percentile(
-    [num for _, num in decow.items()], 
+    [num for _, num in decow.items()],
     q=[100 / 6, 100 / 3, 50, 200 / 3, 500 / 6, 100])
 
 
 def cow_to_float(sentences: List[str]):
     feats = cow_to_int8(sentences)
-    n_feats = feats.shape[-1] - 1
-    return feats[:, 1:] / np.tile(feats[:, 0].reshape(-1, 1), n_feats)
+    return divide_by_1st_col(feats)
 
 
 def cow_to_int8(sentences: List[str]):

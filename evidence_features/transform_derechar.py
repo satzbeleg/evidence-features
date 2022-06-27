@@ -2,6 +2,7 @@ import os
 import gc
 from typing import List
 import numpy as np
+from .utils import divide_by_1st_col
 
 # path to the pretrained epitran model
 MODELPATH = os.getenv("MODELFOLDER", "./models")
@@ -32,19 +33,17 @@ gc.collect()
 
 
 brackets1 = np.percentile(
-    [num for _, num in derechar.items()], 
+    [num for _, num in derechar.items()],
     q=[100 / 6, 100 / 3, 50, 200 / 3, 500 / 6, 100])
 
 brackets2 = np.percentile(
-    [num for _, num in derebigr.items()], 
+    [num for _, num in derebigr.items()],
     q=[10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
-
 
 
 def derechar_to_float(sentences: List[str]):
     feats = derechar_to_int16(sentences)
-    n_feats = feats.shape[-1] - 1
-    return feats[:, 1:] / np.tile(feats[:, 0].reshape(-1, 1), n_feats)
+    return divide_by_1st_col(feats)
 
 
 def derechar_to_int16(sentences: List[str]):
@@ -69,8 +68,7 @@ def derechar_to_int16(sentences: List[str]):
 
 def derebigram_to_float(sentences: List[str]):
     feats = derebigram_to_int16(sentences)
-    n_feats = feats.shape[-1] - 1
-    return feats[:, 1:] / np.tile(feats[:, 0].reshape(-1, 1), n_feats)
+    return divide_by_1st_col(feats)
 
 
 def derebigram_to_int16(sentences: List[str]):
@@ -78,8 +76,8 @@ def derebigram_to_int16(sentences: List[str]):
     for sent in sentences:
         if len(sent) >= 3:
             # lookup frequency
-            freqs = [derebigr.get(sent[i:(i + 2)], 0.0) 
-                    for i in range(1, len(sent) - 1)]
+            freqs = [derebigr.get(sent[i:(i + 2)], 0.0)
+                     for i in range(1, len(sent) - 1)]
             # assign to decentile
             quantiles = [np.argmax(f <= brackets2) for f in freqs]
             # count decentiles

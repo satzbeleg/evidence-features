@@ -14,4 +14,3 @@ def test1():
     assert enc1.shape == (2, 6)
     assert enc2.shape == (2, 4)
     assert enc3.shape == (2, 4)
-

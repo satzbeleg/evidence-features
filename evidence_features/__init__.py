@@ -4,7 +4,7 @@ from .transform_sbert import (
     sbert_to_float
 )
 
-from .trankit_to_int8 import (
+from .transform_trankit import (
     trankit_to_float,
     trankit_to_int8
 )

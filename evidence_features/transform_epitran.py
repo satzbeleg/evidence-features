@@ -2,7 +2,8 @@ import epitran
 import ipasymbols
 import numpy as np
 from typing import List
-import numpy as np
+from .utils import divide_by_1st_col
+
 
 # Load the pretrained model
 model_epi = epitran.Epitran('deu-Latn')
@@ -10,8 +11,7 @@ model_epi = epitran.Epitran('deu-Latn')
 
 def consonant_to_float(sentences: List[str]):
     feats = consonant_to_int16(sentences)
-    n_feats = feats.shape[-1] - 1  # should be 3
-    return feats[:, 1:] / np.tile(feats[:, 0].reshape(-1, 1), n_feats)
+    return divide_by_1st_col(feats)
 
 
 def consonant_to_int16(sentences: List[str]):
@@ -28,8 +28,8 @@ def consonant_to_int16(sentences: List[str]):
         # save features
         feats.append((
             len(ipatxt),
-            clusters.get(1, 0), 
-            clusters.get(2, 0), 
+            clusters.get(1, 0),
+            clusters.get(2, 0),
             clusters.get(3, 0)
         ))
     # done
