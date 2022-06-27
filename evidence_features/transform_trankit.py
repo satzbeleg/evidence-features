@@ -1,0 +1,187 @@
+import os
+import torch
+import trankit
+import node_distance as nd
+from typing import List
+import numpy as np
+
+# path to the pretrained trankit model
+MODELPATH = os.getenv("MODELFOLDER", "./models")
+MODELPATH = os.path.join(MODELPATH, "trankit")
+
+# Load the pretrained model
+model_trankit = trankit.Pipeline(
+    lang='german-hdt', 
+    gpu=torch.cuda.is_available(), 
+    cache_dir=MODELPATH
+)
+
+
+# code for PoS-tag distribution
+# https://universaldependencies.org/u/pos/
+# -ndbt/nid- = not detected by trankit, or not in dataset
+TAGSET = [
+    'ADJ', 
+    'ADP', 
+    'ADV', 
+    'AUX', 
+    'CCONJ', 
+    'DET', 
+    'INTJ', 
+    'NOUN', 
+    'NUM',
+    'PART', 
+    'PRON', 
+    'PROPN', 
+    'PUNCT', 
+    'SCONJ', 
+    # 'SYM',  # -ndbt/nid-
+    'VERB', 
+    'X'
+]
+
+
+def get_postag_counts(snt):
+    postags = [t.get("upos") for t in snt['tokens']]
+    n_tokens = len(postags)
+    cnt = np.zeros((len(TAGSET),), dtype=np.int8)
+    for tag in postags:
+        try:
+            idx = TAGSET.index(tag)
+        except:
+            idx = TAGSET.index("X")
+        cnt[idx] += 1
+    return len(postags), cnt
+
+
+# morphtags
+# Ensure that all STTS conversions are included
+# https://universaldependencies.org/tagset-conversion/de-stts-uposf.html
+# -ndbt/nid- = not detected by trankit, or not in dataset
+MORPHTAGS = [
+    # punctuation type (3/11)
+    "PunctType=Brck",  # `$(`
+    "PunctType=Comm",  # `$,`
+    "PunctType=Peri",  # `$.`
+    # adposition type (3/4)
+    "AdpType=Post",  # APPO
+    "AdpType=Prep",  # APPR, APPRART
+    "AdpType=Circ",  # APZR
+    # particle type (3/6)
+    "PartType=Res",  # PTKANT
+    "PartType=Vbp",  # PTKVZ
+    "PartType=Inf",  # PTKZU
+    # pronominal type (8/11)
+    "PronType=Art",  # APPRART, ART
+    "PronType=Dem",  # PAV, PDAT, PDS
+    "PronType=Ind",  # PIAT, PIDAT, PIS
+    # "PronType=Neg",  # PIAT, PIDAT, PIS -ndbt/nid-
+    # "PronType=Tot",  # PIAT, PIDAT, PIS -ndbt/nid-
+    "PronType=Prs",  # PPER, PPOSAT, PPOSS, PRF
+    "PronType=Rel",  # PRELAT, PRELS
+    "PronType=Int",  # PWAT, PWAV, PWS
+    # other related to STTS post tags
+    # "AdjType=Pdt",  # PIDAT -ndbt/nid-
+    "ConjType=Comp",  # KOKOM
+    "Foreign=Yes",  # FM
+    "Hyph=Yes",  # TRUNC
+    "NumType=Card",  # CARD
+    "Polarity=Neg",  # PTKNEG
+    "Poss=Yes",  # PPOSAT, PPOSS
+    "Reflex=Yes",  # PRF
+    "Variant=Short",  # ADJD
+    # verbs
+    "VerbForm=Fin",  # VAFIN, VAIMP, VMFIN, VVFIN, VVIMP
+    "VerbForm=Inf",  # VAINF, VVINF, VVIZU
+    "VerbForm=Part",  # VAPP, VMPP, VVPP
+    "Mood=Ind",  # VAFIN, VMFIN, VVFIN
+    "Mood=Imp",  # VAIMP, VVIMP
+    # "Mood=Sub",  # -ndbt/nid-
+    "Aspect=Perf",  # VAPP, VMPP, VVPP
+    "VerbType=Mod",  # VMPP
+    # other syntax
+    "Gender=Fem", 
+    "Gender=Masc", 
+    "Gender=Neut",
+    "Number=Sing", 
+    "Number=Plur",
+    "Person=1", 
+    "Person=2", 
+    "Person=3",
+    "Case=Nom", 
+    "Case=Dat", 
+    "Case=Gen", 
+    "Case=Acc",
+    # "Definite=Ind",  # -ndbt/nid-
+    # "Definite=Def",  # -ndbt/nid-
+    "Degree=Pos", 
+    "Degree=Cmp", 
+    "Degree=Sup",
+    "Tense=Pres", 
+    "Tense=Past", 
+    # "Tense=Fut",  # -ndbt/nid-
+    # "Tense=Imp",  # -ndbt/nid-
+    # "Tense=Pqp",  # -ndbt/nid-
+    # "Polite=",  # -ndbt/nid-  
+]
+
+
+def get_morphtag_counts(snt):
+    cnt = np.zeros((len(MORPHTAGS),), dtype=np.int8)
+    for t in snt['tokens']:
+        mfeats = t.get("feats")
+        if isinstance(mfeats, str):
+            for idx, tag in enumerate(MORPHTAGS):
+                if tag in mfeats:
+                    cnt[idx] += 1
+    return len(snt['tokens']), cnt
+
+
+def get_nodedist(snt):
+    # read trankit dependency tree
+    edges = [(t.get("head"), t.get("id"))
+             for t in snt.get("tokens")
+             if isinstance(t.get("id"), int)]
+    # number of node
+    num_nodes = len(snt.get("tokens")) + 1
+    # node and token distance
+    nodedist, tokendist, _ = nd.node_token_distances(
+        [edges], [num_nodes], cutoff=25)
+    # count node vs token distance
+    _, _, cnt = nd.tokenvsnode_distribution(
+        tokendist, nodedist, xmin=-5, xmax=15)
+    # done
+    return cnt.astype(np.int8)
+
+
+def trankit_to_float(sentences: List[str]):
+    feats1, feats2, feats3 = trankit_to_int8(sentences)
+    n_feats1 = feats1.shape[-1] - 1
+    out1 = feats1[:, 1:] / np.tile(feats1[:, 0].reshape(-1, 1), n_feats1)
+    n_feats2 = feats2.shape[-1] - 1
+    out2 = feats2[:, 1:] / np.tile(feats2[:, 0].reshape(-1, 1), n_feats2)
+    n_feats3 = feats3.shape[-1]
+    out3 = feats3 / np.tile(feats3.sum(axis=1).reshape(-1, 1), n_feats3)
+    return out1, out2, out3
+
+
+def trankit_to_int8(sentences: List[str]):
+    feats1 = []
+    feats2 = []
+    feats3 = []
+    for sent in sentences:
+        # parse sentence
+        snt = model_trankit(sent, is_sent=True)
+        num1, cnt1 = get_postag_counts(snt)
+        num2, cnt2 = get_morphtag_counts(snt)
+        cnt3 = get_nodedist(snt)
+        feats1.append((num1, *cnt1.tolist()))
+        feats2.append((num2, *cnt2.tolist()))
+        feats3.append(cnt3.tolist())
+    return (
+        np.vstack(feats1).astype(np.int8),
+        np.vstack(feats2).astype(np.int8),
+        np.vstack(feats3).astype(np.int8)
+    )
+
+

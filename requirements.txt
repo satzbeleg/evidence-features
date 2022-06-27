@@ -1,25 +1,21 @@
 # general purpose
-numpy
-#scikit-learn>=1,<2
+numpy>=1.21.6,<2
 
 # SBert (semantics)
-sentence-transformers==2.2.0
+sentence-transformers>=2.2.0,<3
 
 # node-dist, pos tags, morphosyntax features
-torch
-trankit==1.1.1
-node-distance==0.1.0
+torch>=1.11.0,<2
+trankit>=1.1.1,<2
+node-distance>=0.1.0,<1
 
 # IPA consonant clusters (phonetics)
-epitran==1.18
-ipasymbols==0.0.1
+epitran>=1.18,<2
+ipasymbols>=0.0.1,<1
 
 # SMOR (morphology)
-sfst-transduce==1.0.1
+sfst-transduce>=1.0.1,<2
 
 # COW, lemma frequency
 nltk>=3.7,<4
-pandas==1.3.5
-
-# fixes
-#protobuf<=3.20.*
+pandas>=1.3.5,<2

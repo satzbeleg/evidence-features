@@ -4,7 +4,7 @@
     "orcid": "0000-0002-0440-4868"
   }],
   "title": "evidence-features: Linguistic feature extraction",
-  "description": "Linguistic feature extraction for German (lang: de) as 8-bit interger representations.",
+  "description": "Linguistic feature extraction for German (lang: de) as 8-bit or 16-bit integer representations.",
   "license": "Apache-2.0",
   "upload_type": "software",
   "keywords": [
