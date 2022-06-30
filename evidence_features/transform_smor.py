@@ -99,3 +99,11 @@ def smor_to_int8(sentences: List[str]):
         np.vstack(feats2).astype(np.int8),
         np.vstack(feats3).astype(np.int8)
     )
+
+
+def smor_names():
+    return (
+        [f"smor_syn_ambiv_{j}" for j in [1, 2, 4, 8, 16, "more"]],
+        [f"smor_lex_ambiv_{j}" for j in [1, 2, 3, "more"]],
+        [f"smor_work_memo_{j}" for j in [1, 2, 3, "more"]]
+    )

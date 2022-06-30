@@ -34,6 +34,7 @@ setuptools.setup(
     install_requires=[
         "numpy>=1.21.6,<2",
         "sentence-transformers>=2.2.0,<3",
+        "keras-hrp>=0.1.0,<1",
         "torch>=1.11.0,<2",
         "trankit>=1.1.1,<2",
         "node-distance>=0.1.0,<1",

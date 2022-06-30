@@ -111,3 +111,5 @@ profile/data*
 
 models
 .DS_Store
+demo/data/*.txt
+demo/*.tar.gz

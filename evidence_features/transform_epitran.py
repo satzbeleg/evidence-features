@@ -34,3 +34,7 @@ def consonant_to_int16(sentences: List[str]):
         ))
     # done
     return np.vstack(feats).astype(np.int16)
+
+
+def consonant_names():
+    return [f"consonant_{j}" for j in [1, 2, 3]]

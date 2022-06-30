@@ -62,19 +62,17 @@ dvc pull
 ## Int8 vs floating-point features 
 All features are 
 
+
+## Usage
+
+
+
 ## Evaluation
 - [ ] german senteval
 - [ ] correlation among features
 - [ ] 
 
-## Usage
 
-Table of Contents
-
-* [Use Case 1](#use-case-1)
-
-
-### Use Case 1
 
 
 ## Appendix

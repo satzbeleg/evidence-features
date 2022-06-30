@@ -93,3 +93,12 @@ def derebigram_to_int16(sentences: List[str]):
             feats.append([1] + [0] * len(brackets1))
     # done
     return np.vstack(feats).astype(np.int16)
+
+
+def derechar_names():
+    return [f"char_{j}" for j in [16, 33, 50, 67, 83, 100]]
+
+
+def derebigram_names():
+    return [f"bigram_{j}" for j in [
+        10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]

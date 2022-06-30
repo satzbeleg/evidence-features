@@ -180,3 +180,12 @@ def trankit_to_int8(sentences: List[str]):
         np.vstack(feats2).astype(np.int8),
         np.vstack(feats3).astype(np.int8)
     )
+
+
+def trankit_names():
+    return (
+        [f"pos_{tag.lower()}" for tag in TAGSET],
+        [f"mfeat_{tag.lower().replace('=', '_')}" for tag in MORPHTAGS],
+        [f"nodedist_m{j}" for j in range(5, 0, -1)] + [
+            f"nodedist_p{j}" for j in range(0, 15 + 1, 1)]
+    )

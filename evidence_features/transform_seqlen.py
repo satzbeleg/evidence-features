@@ -17,3 +17,7 @@ def seqlen_to_int16(sentences: List[str]):
             len(words)
         ))
     return np.vstack(feats).astype(np.int16)
+
+
+def seqlen_names():
+    return ["seqlen_string", "seqlen_words"]

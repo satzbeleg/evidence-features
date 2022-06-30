@@ -3,6 +3,7 @@ numpy>=1.21.6,<2
 
 # SBert (semantics)
 sentence-transformers>=2.2.0,<3
+keras-hrp>=0.1.0,<1
 
 # node-dist, pos tags, morphosyntax features
 torch>=1.11.0,<2

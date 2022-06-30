@@ -1,5 +1,7 @@
 import os
 import sentence_transformers as sbert
+import keras_hrp as khrp
+import numpy as np
 from typing import List
 
 # path to the pretrained sbert model
@@ -12,10 +14,28 @@ model_sbert = sbert.SentenceTransformer(
     cache_folder=MODELPATH
 )
 
+# HRP layer
+model_hrp = khrp.HashedRandomProjection(
+    output_size=1024,
+    random_state=42
+)
 
-def sbert_to_float(sentences: List[str]):
-    return model_sbert.encode(sentences)
+
+def sbert_to_bool(sentences: List[str]):
+    encoded = sbert_to_int8(sentences)
+    return np.vstack([khrp.int8_to_bool(enc) for enc in encoded])
 
 
 def sbert_to_int8(sentences: List[str]):
-    pass
+    # run SBert
+    feats = model_sbert.encode(sentences)
+    # project to boolean
+    hashed = model_hrp(feats)
+    # encode to int8
+    return np.vstack([
+        khrp.bool_to_int8(h.reshape(-1))
+        for h in hashed.numpy().astype(bool)])
+
+
+def sbert_names():
+    return [f"sbert_{j}" for j in range(384)]

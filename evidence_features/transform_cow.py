@@ -63,3 +63,7 @@ def cow_to_int8(sentences: List[str]):
         ))
     # done
     return np.vstack(feats).astype(np.int8)
+
+
+def cow_names():
+    return [f"cow_{j}" for j in [16, 33, 50, 67, 83, 100]]
