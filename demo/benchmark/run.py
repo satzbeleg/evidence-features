@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../..')
+
 from typing import List
 import sentence_embedding_evaluation_german as seeg
 import evidence_features as evf
