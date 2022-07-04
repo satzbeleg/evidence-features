@@ -4,3 +4,6 @@ jupyterlab
 
 # demo/dialect
 scikit-learn
+
+# demo/benchmark
+sentence-embedding-evaluation-german

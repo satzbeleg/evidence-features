@@ -84,6 +84,19 @@ python3 preprocess.py
 python3 train.py
 ```
 
+### Demo - Benchmarking
+[Sentence embedding evaluation for German](https://github.com/ulf1/sentence-embedding-evaluation-german)
+
+```sh
+source .venv/bin/activate
+export MODELFOLDER="$(pwd)/models"
+cd demo/benchmark
+bash download-datasets.sh
+python3 preprocess.py
+python3 train.py
+```
+
+
 ## Appendix
 
 ### Python commands
