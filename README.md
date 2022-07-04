@@ -73,7 +73,16 @@ All features are
 - [ ] 
 
 
+### Demo - Dialect Identification
 
+```sh
+source .venv/bin/activate
+export MODELFOLDER="$(pwd)/models"
+cd demo/dialect
+bash download-corpora.sh
+python3 preprocess.py
+python3 train.py
+```
 
 ## Appendix
 

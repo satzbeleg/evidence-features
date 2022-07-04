@@ -21,9 +21,13 @@ model_hrp = khrp.HashedRandomProjection(
 )
 
 
+def sbert_i2b(encoded):
+    return np.vstack([khrp.int8_to_bool(enc) for enc in encoded])
+
+
 def sbert_to_bool(sentences: List[str]):
     encoded = sbert_to_int8(sentences)
-    return np.vstack([khrp.int8_to_bool(enc) for enc in encoded])
+    return sbert_i2b(encoded)
 
 
 def sbert_to_int8(sentences: List[str]):
@@ -38,4 +42,4 @@ def sbert_to_int8(sentences: List[str]):
 
 
 def sbert_names():
-    return [f"sbert_{j}" for j in range(384)]
+    return [f"sbert_{j}" for j in range(1024)]

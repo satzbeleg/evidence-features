@@ -3,6 +3,7 @@ __version__ = '0.1.0'
 from .transform_sbert import (
     sbert_to_bool,
     sbert_to_int8,
+    sbert_i2b,
     sbert_names
 )
 
@@ -42,10 +43,13 @@ from .transform_smor import (
 from .transform_seqlen import (
     seqlen_to_float,
     seqlen_to_int16,
+    seqlen_i2f,
     seqlen_names
 )
 
 from .transform_all import (
     to_float,
+    to_int,
+    i2f,
     get_names
 )

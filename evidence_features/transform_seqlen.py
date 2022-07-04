@@ -2,9 +2,13 @@ from typing import List
 import numpy as np
 
 
+def seqlen_i2f(feats):
+    return np.log(feats + 1.)
+
+
 def seqlen_to_float(sentences: List[str]):
     feats = seqlen_to_int16(sentences)
-    return np.log(feats + 1.)
+    return seqlen_i2f(feats)
 
 
 def seqlen_to_int16(sentences: List[str]):
