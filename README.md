@@ -92,8 +92,8 @@ source .venv/bin/activate
 export MODELFOLDER="$(pwd)/models"
 cd demo/benchmark
 bash download-datasets.sh
-python3 preprocess.py
-python3 train.py
+nohup python3 run.py > log.log &
+tail -f log.log
 ```
 
 
