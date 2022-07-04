@@ -40,37 +40,26 @@ If you have access to ZDL's DVC backend, run
 dvc pull
 ```
 
-| Status | Language level | Used models & statistics | Metrics |
-|:---:|:---:|:---|:---|
-| [x] | semantics | [SBert](http://dx.doi.org/10.18653/v1/D19-1410), `paraphrase-multilingual-MiniLM-L12-v2`; Hashed random projection | Contextual sentence embeddings |
-| [x] | syntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, dependency parser; [node-distance](https://doi.org/10.5281/zenodo.5747823) | |
-| [x] | morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNLL-U UPOS](https://universaldependencies.org/u/pos/index.html) | Part-of-Speech (PoS) tags |
-| [x] | morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNNL-U Universal Features](https://universaldependencies.org/u/feat/index.html) | Other lexical and grammatical properties |
-| [ ] | morphosyntax | [SoMeWeTa]() | The additional PoS-tags of the STTS-IKB tagset |
-| [x] | phonetics | [epitran](https://aclanthology.org/L18-1429/), `deu-Latn`; [ipasymbols](https://pypi.org/project/ipasymbols/)  | IPA-based consonant clusters |
-| [x] | lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Lemma frequencies |
-| [x] | morphology | [DeReChar](https://www.ids-mannheim.de/fileadmin/kl/derewo) | Character and character-level bi-gram frequencies |
-| [x] | morphology | [SMOR](https://aclanthology.org/L04-1275/) | Number of morphemes |
-| [x] | - | - | Other statistics, e.g., text length |
-| [ ] | sentiment | Listenabgleich | Emoji & emoticons frequency and sentiment |
-| [ ] | sentiment | [SentiWS](https://aclanthology.org/L10-1339/) | Sentiment analysis |
-| [ ] | graphemics | [better-profanity](https://github.com/snguyenthanh/better_profanity) | leetspeak & internet jargon frequency and sentiment |
-| [ ] | graphemics | | Old-German characters |
-| [ ] | change | | Foreign language and German dialect detection |
+| Language level | Used models & statistics | Metrics |
+|:---:|:---|:---|
+| semantics | [SBert](http://dx.doi.org/10.18653/v1/D19-1410), `paraphrase-multilingual-MiniLM-L12-v2`; Hashed random projection | Contextual sentence embeddings |
+| syntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, dependency parser; [node-distance](https://doi.org/10.5281/zenodo.5747823) | |
+| morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNLL-U UPOS](https://universaldependencies.org/u/pos/index.html) | Part-of-Speech (PoS) tags |
+| morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNNL-U Universal Features](https://universaldependencies.org/u/feat/index.html) | Other lexical and grammatical properties |
+| phonetics | [epitran](https://aclanthology.org/L18-1429/), `deu-Latn`; [ipasymbols](https://pypi.org/project/ipasymbols/)  | IPA-based consonant clusters |
+| morphology | [DeReChar](https://www.ids-mannheim.de/fileadmin/kl/derewo) | Character and character-level bi-gram frequencies |
+| lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Lemma frequencies |
+| morphology | [SMOR](https://aclanthology.org/L04-1275/) | Number of morphemes |
+| - | - | Other statistics, e.g., text length |
 
 
 ## Int8 vs floating-point features 
 All features are 
 
 
-## Usage
 
-
-
-## Evaluation
-- [ ] german senteval
-- [ ] correlation among features
-- [ ] 
+## Demo - Correlation among features
+...
 
 
 ### Demo - Dialect Identification
