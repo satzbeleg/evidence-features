@@ -90,7 +90,7 @@ def derebigram_to_int16(sentences: List[str]):
                 *cnt.tolist()
             ))
         else:
-            feats.append([1] + [0] * len(brackets1))
+            feats.append([1] + [0] * len(brackets2))
     # done
     return np.vstack(feats).astype(np.int16)
 
