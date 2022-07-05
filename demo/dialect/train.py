@@ -31,12 +31,13 @@ y_train = trf.transform([[s] for s in y_train])
 
 # modeling
 model = sklearn.ensemble.RandomForestClassifier(
-    n_estimators=100,
-    max_depth=16,
-    min_samples_leaf=10,
+    n_estimators=128,
+    max_depth=64,
+    min_samples_leaf=0.001,
+    max_features="sqrt",
     bootstrap=True, oob_score=True, max_samples=0.5,
     random_state=42,
-    class_weight="balanced_subsample"
+    class_weight="balanced"
 )
 
 # training
