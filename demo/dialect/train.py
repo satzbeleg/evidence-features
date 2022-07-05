@@ -3,6 +3,7 @@ sys.path.append('../..')
 
 import gzip
 import evidence_features as evf
+import sklearn.preprocessing
 import sklearn.ensemble
 import numpy as np
 import joblib
@@ -23,6 +24,10 @@ with gzip.GzipFile('dataset.npy.gz', 'r') as fp:
 X_train = evf.i2f(*X_train)
 X_test = evf.i2f(*X_test)
 
+# convert to binary problems
+trf = sklearn.preprocessing.MultiLabelBinarizer(classes=labels)
+y_test = trf.fit_transform([[s] for s in y_test])
+y_train = trf.transform([[s] for s in y_train])
 
 # modeling
 model = sklearn.ensemble.RandomForestClassifier(
