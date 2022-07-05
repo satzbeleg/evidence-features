@@ -10,7 +10,7 @@ import json
 # (2) Specify the preprocessing
 def preprocesser(batch: List[str], params: dict=None) -> List[List[float]]:
     features = evf.to_float(batch)
-    return features
+    return features.astype(np.float32)
 
 
 # (3) Training settings
