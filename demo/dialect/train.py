@@ -3,7 +3,7 @@ sys.path.append('../..')
 
 import gzip
 import evidence_features as evf
-import sklearn.preprocessing
+# import sklearn.preprocessing
 import sklearn.ensemble
 import numpy as np
 import joblib
@@ -25,15 +25,20 @@ X_train = evf.i2f(*X_train)
 X_test = evf.i2f(*X_test)
 
 # convert to binary problems
-trf = sklearn.preprocessing.MultiLabelBinarizer(classes=labels)
-y_test = trf.fit_transform([[s] for s in y_test])
-y_train = trf.transform([[s] for s in y_train])
+# trf = sklearn.preprocessing.MultiLabelBinarizer(classes=labels)
+# y_test = trf.fit_transform([[s] for s in y_test])
+# y_train = trf.transform([[s] for s in y_train])
+
+labels = labels.tolist()
+y_test = [labels.index(y) for y in y_test]
+y_train = [labels.index(y) for y in y_train]
+
 
 # modeling
 model = sklearn.ensemble.RandomForestClassifier(
     n_estimators=128,
-    max_depth=64,
-    min_samples_leaf=0.001,
+    max_depth=32,
+    min_samples_leaf=30,
     max_features="sqrt",
     bootstrap=True, oob_score=True, max_samples=0.5,
     random_state=42,
