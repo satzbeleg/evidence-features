@@ -172,13 +172,11 @@ def trankit_to_int8(sentences: List[str]):
             num1, cnt1 = get_postag_counts(snt)
             num2, cnt2 = get_morphtag_counts(snt)
             cnt3 = get_nodedist(snt)
-        except RuntimeError as e:
+        except Exception as e:  # RuntimeError, AssertionError
             num1, cnt1 = 0, np.zeros((len(TAGSET),), dtype=np.int8)
             num2, cnt2 = 0, np.zeros((len(MORPHTAGS),), dtype=np.int8)
             cnt3 = np.array([0 for _ in range(21)])
             print(e)
-        except Exception as e:
-            raise Exception(e)
         feats1.append((num1, *cnt1.tolist()))
         feats2.append((num2, *cnt2.tolist()))
         feats3.append(cnt3.tolist())
