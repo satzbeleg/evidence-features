@@ -1,6 +1,6 @@
 # packages required to run example notebooks
 jupyterlab
-# matplotlib
+matplotlib
 
 # demo/dialect
 scikit-learn

@@ -66,7 +66,7 @@ export MODELFOLDER="$(pwd)/models"
 cd demo/corr
 bash download-corpora.sh
 python3 preprocess.py
-python3 train.py
+jupyter lab
 ```
 
 ### Benchmarking
