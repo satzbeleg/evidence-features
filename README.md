@@ -58,22 +58,18 @@ All features are
 
 
 
-## Demo - Correlation among features
-...
-
-
-### Demo - Dialect Identification
+## Correlation among features
 
 ```sh
 source .venv/bin/activate
 export MODELFOLDER="$(pwd)/models"
-cd demo/dialect
+cd demo/corr
 bash download-corpora.sh
 python3 preprocess.py
 python3 train.py
 ```
 
-### Demo - Benchmarking
+### Benchmarking
 [Sentence embedding evaluation for German](https://github.com/ulf1/sentence-embedding-evaluation-german)
 
 ```sh
