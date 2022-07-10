@@ -54,7 +54,9 @@ dvc pull
 
 
 ## Int8 vs floating-point features 
-All features are 
+All features are encoded as Int8 features.
+Most features are count data or naturally integer numbers that are transformed to ratios lateron, i.e., we will save 8-bit integers instead of 32-bit floating-points.
+In case of SBert wer compress the floating-point feature with hashed random projections to bit-values that are stored as Int8 representations - The storage requirement can be reduced by factor 12 to 16.
 
 
 
