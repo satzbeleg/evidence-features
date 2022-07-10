@@ -81,6 +81,21 @@ nohup python3 run.py > log.log &
 tail -f log.log
 ```
 
+Balanced F1 scores on the test sets. 
+*EV feats.* uses hashed random projections of SBert features,
+i.e., the F1 scores are expected to decrease but not too much.
+Interestingly, Lower German dialect detection (LSDC) does not work at all with *EV feats.*. 
+
+| Task | SBert | EV Feats |
+|---:|---:|---:|
+| FCLAIM | 0.672 | 0.634 |
+|   VMWE | 0.751 | 0.729 |
+| OL19-C | 0.611 | 0.591 |
+| ABSD-2 | 0.521 | 0.514 |
+|  MIO-P | 0.820 | 0.833 |
+|  ARCHI | 0.374 | 0.365 |
+|   LSDC | 0.396 | 0.007 |
+
 
 ## Appendix
 
