@@ -1,6 +1,9 @@
 # packages required to run example notebooks
 jupyterlab
-# matplotlib
+matplotlib
 
 # demo/dialect
 scikit-learn
+
+# demo/benchmark
+sentence-embedding-evaluation-german

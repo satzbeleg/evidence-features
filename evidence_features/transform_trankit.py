@@ -167,11 +167,16 @@ def trankit_to_int8(sentences: List[str]):
     feats2 = []
     feats3 = []
     for sent in sentences:
-        # parse sentence
-        snt = model_trankit(sent, is_sent=True)
-        num1, cnt1 = get_postag_counts(snt)
-        num2, cnt2 = get_morphtag_counts(snt)
-        cnt3 = get_nodedist(snt)
+        try:
+            snt = model_trankit(sent, is_sent=True)
+            num1, cnt1 = get_postag_counts(snt)
+            num2, cnt2 = get_morphtag_counts(snt)
+            cnt3 = get_nodedist(snt)
+        except Exception as e:  # RuntimeError, AssertionError
+            num1, cnt1 = 0, np.zeros((len(TAGSET),), dtype=np.int8)
+            num2, cnt2 = 0, np.zeros((len(MORPHTAGS),), dtype=np.int8)
+            cnt3 = np.array([0 for _ in range(21)])
+            print(e)
         feats1.append((num1, *cnt1.tolist()))
         feats2.append((num2, *cnt2.tolist()))
         feats3.append(cnt3.tolist())

@@ -18,8 +18,6 @@ for FILE in glob.glob("./data/*.txt"):
         dat = fp.readlines()
         dat = [s.replace("\n", "") for s in dat]
         random.shuffle(dat)
-    # CLIP
-    dat = dat[:10]
     # read targets
     s = FILE.split("data/")[-1]
     lang, cty = s[:3], s[4:6]
