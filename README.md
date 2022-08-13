@@ -9,13 +9,17 @@ Linguistic feature extraction for German (lang: de) as 8-bit interger representa
 
 ## Install a virtual environment
 ```sh
+# install virtualenv
 python3.7 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
+# install PyTorch with GPU support for Trankit
+pip install torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html
+# install other packages
+pip install -e .
 # pip install -r requirements.txt --no-cache-dir
 # pip install -r requirements-dev.txt --no-cache-dir
 # pip install -r requirements-demo.txt --no-cache-dir
-pip install -e .
 ```
 
 And, or install python package `evidence-features` from Github.
