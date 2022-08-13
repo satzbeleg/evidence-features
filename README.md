@@ -109,7 +109,7 @@ Interestingly, Lower German dialect detection (LSDC) does not work at all with *
 ### Python commands
 
 * Jupyter for the examples: `jupyter lab`
-* Check syntax: `flake8 --ignore=F401 --exclude=$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')`
+* Check syntax: `flake8 --ignore=F401 --exclude=demo,$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')`
 * Run Unit Tests: `PYTHONPATH=. pytest`
 
 Publish
