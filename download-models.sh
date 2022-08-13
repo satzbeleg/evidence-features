@@ -36,17 +36,23 @@ if [ ! -f "${MODELFOLDER2}/smor.a" ]; then
   rm SMOR-linux.zip
 fi
 
+# DeReChar frequencies
+if [ ! -f "${MODELFOLDER2}/derechar.txt" ]; then
+  wget -nc -q "https://www.ids-mannheim.de/fileadmin/kl/derewo/DeReChar-v-bi-DRC-2021-10-31-1.0.txt" -O "derechar.txt"
+fi
+
+# FastText 176 model
+if [ ! -f "${MODELFOLDER2}/lid.176.ftz" ]; then
+  wget -nc -q "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz" -O "lid.176.ftz"
+fi
+
+# try last
 # COW lemma frequencies
 if [ ! -f "${MODELFOLDER2}/decow.csv" ]; then
   wget -nc -q "https://nlp-data-filestorage.s3.eu-central-1.amazonaws.com/word-frequencies/decow_wordfreq_cistem.csv.7z"
   p7zip -d "decow_wordfreq_cistem.csv.7z"
   mv decow_wordfreq_cistem.csv decow.csv
   rm decow_wordfreq_cistem.csv.7z
-fi
-
-# DeReChar frequencies
-if [ ! -f "${MODELFOLDER2}/derechar.txt" ]; then
-  wget -nc -q "https://www.ids-mannheim.de/fileadmin/kl/derewo/DeReChar-v-bi-DRC-2021-10-31-1.0.txt" -O "derechar.txt"
 fi
 
 echo "Done"

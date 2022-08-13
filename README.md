@@ -55,6 +55,7 @@ dvc pull
 | lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Lemma frequencies |
 | morphology | [SMOR](https://aclanthology.org/L04-1275/) | Number of morphemes |
 | - | - | Other statistics, e.g., text length |
+| - | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or lang. group |
 
 
 ## Int8 vs floating-point features 
@@ -108,7 +109,7 @@ Interestingly, Lower German dialect detection (LSDC) does not work at all with *
 ### Python commands
 
 * Jupyter for the examples: `jupyter lab`
-* Check syntax: `flake8 --ignore=F401 --exclude=$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')`
+* Check syntax: `flake8 --ignore=F401 --exclude=demo,$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')`
 * Run Unit Tests: `PYTHONPATH=. pytest`
 
 Publish

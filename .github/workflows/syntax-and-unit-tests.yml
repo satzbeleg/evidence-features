@@ -25,9 +25,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
+        export MODELFOLDER="$(pwd)/models"
+        bash download-models.sh
     - name: Lint with flake8
       run: |
-        flake8 --ignore=F401 --exclude=$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')
+        flake8 --ignore=F401 --exclude=demo,$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')
     - name: Unit Test with pytest
       run: |
         PYTHONPATH=. pytest
