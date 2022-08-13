@@ -55,7 +55,7 @@ dvc pull
 | lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Lemma frequencies |
 | morphology | [SMOR](https://aclanthology.org/L04-1275/) | Number of morphemes |
 | - | - | Other statistics, e.g., text length |
-| - | - | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or lang. group |
+| - | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or lang. group |
 
 
 ## Int8 vs floating-point features 
