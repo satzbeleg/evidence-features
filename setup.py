@@ -42,7 +42,8 @@ setuptools.setup(
         "ipasymbols>=0.0.1,<1",
         "sfst-transduce>=1.0.1,<2",
         "nltk>=3.7,<4",
-        "pandas>=1.3.5,<2"
+        "pandas>=1.3.5,<2",
+        "fasttext>=0.9.2,<1",
     ],
     # scripts=['scripts/examplescript.py'],
     python_requires='>=3.7',

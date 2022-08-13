@@ -38,6 +38,12 @@ from .transform_seqlen import (
     seqlen_i2f,
     seqlen_names
 )
+from .transform_fasttext176 import (
+    fasttext176_to_float,
+    fasttext176_to_int8,
+    fasttext176_i2f,
+    fasttext176_names
+)
 from .utils import (
     divide_by_1st_col,
     divide_by_sum
@@ -55,9 +61,10 @@ def to_float(sentences: List[str]):
     feats8 = cow_to_float(sentences)
     feats9, feats10, feats11 = smor_to_float(sentences)
     feats12 = seqlen_to_float(sentences)
+    feats13 = fasttext176_to_float(sentences)
     return np.hstack([
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats10, feats11, feats12
+        feats9, feats10, feats11, feats12, feats13
     ])
 
 
@@ -70,14 +77,15 @@ def to_int(sentences: List[str]):
     feats8 = cow_to_int8(sentences)
     feats9, feats10, feats11 = smor_to_int8(sentences)
     feats12 = seqlen_to_int16(sentences)
+    feats13 = fasttext176_to_int8(sentences)
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats10, feats11, feats12
+        feats9, feats10, feats11, feats12, feats13
     )
 
 
 def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats10, feats11, feats12):
+        feats9, feats10, feats11, feats12, feats13):
     return np.hstack([
         sbert_i2b(feats1),  # sbert
         divide_by_1st_col(feats2),  # trankit
@@ -90,7 +98,8 @@ def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
         divide_by_1st_col(feats9),  # smor
         divide_by_1st_col(feats10),  # smor
         divide_by_1st_col(feats11),  # smor
-        seqlen_i2f(feats12)  # seqlen
+        seqlen_i2f(feats12),  # seqlen
+        fasttext176_i2f(feats13)   # fasttext176 langdetect
     ])
 
 
@@ -106,4 +115,5 @@ def get_names():
     for tmp in smor_names():  # 9/10/11
         names.extend(tmp)
     names.extend(seqlen_names())  # 12
+    names.extend(fasttext176_names())  # 13
     return names
