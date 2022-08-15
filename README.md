@@ -8,13 +8,17 @@ Linguistic feature extraction for German (lang: de) as 8-bit interger representa
 
 
 ## Install a virtual environment
+
 ```sh
+# Ensure that python packages are availabe
+sudo apt install python3-dev python3-venv
+
 # install virtualenv
-python3.7 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 # install PyTorch with GPU support for Trankit
-pip install torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.7.1+cu110 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
@@ -33,6 +37,9 @@ pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
 The software uses pretrained NLP models and statistics.
 
 ```sh
+# Ensure Debian packages are available
+sudo apt install unzip p7zip-full
+
 # some python package are called
 source .venv/bin/activate
 # set the location for pretrained models and other lists
@@ -41,10 +48,6 @@ export MODELFOLDER="$(pwd)/models"
 bash download-models.sh
 ```
 
-Ensure Debian packages are available
-```sh
-sudo apt install unzip p7zip-full
-```
 
 If you have access to ZDL's DVC backend, run
 
