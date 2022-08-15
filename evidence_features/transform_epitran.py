@@ -33,6 +33,8 @@ def consonant_to_int16(sentences: List[str]):
             clusters.get(3, 0)
         ))
     # done
+    feats = np.maximum(np.iinfo(np.int16).min, feats)
+    feats = np.minimum(np.iinfo(np.int16).max, feats)
     return np.vstack(feats).astype(np.int16)
 
 
