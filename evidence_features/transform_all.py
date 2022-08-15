@@ -59,12 +59,12 @@ def to_float(sentences: List[str]):
     feats6 = derechar_to_float(sentences)
     feats7 = derebigram_to_float(sentences)
     feats8 = cow_to_float(sentences)
-    feats9, feats10, feats11 = smor_to_float(sentences)
+    feats9 = smor_to_float(sentences)
     feats12 = seqlen_to_float(sentences)
     feats13 = fasttext176_to_float(sentences)
     return np.hstack([
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats10, feats11, feats12, feats13
+        feats9, feats12, feats13
     ])
 
 
@@ -75,17 +75,17 @@ def to_int(sentences: List[str]):
     feats6 = derechar_to_int16(sentences)
     feats7 = derebigram_to_int16(sentences)
     feats8 = cow_to_int8(sentences)
-    feats9, feats10, feats11 = smor_to_int8(sentences)
+    feats9 = smor_to_int8(sentences)
     feats12 = seqlen_to_int16(sentences)
     feats13 = fasttext176_to_int8(sentences)
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats10, feats11, feats12, feats13
+        feats9, feats12, feats13
     )
 
 
 def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats10, feats11, feats12, feats13):
+        feats9, feats12, feats13):
     return np.hstack([
         sbert_i2b(feats1),  # sbert
         divide_by_1st_col(feats2),  # trankit
@@ -96,8 +96,6 @@ def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
         divide_by_1st_col(feats7),  # bigram
         divide_by_1st_col(feats8),  # cow
         divide_by_1st_col(feats9),  # smor
-        divide_by_1st_col(feats10),  # smor
-        divide_by_1st_col(feats11),  # smor
         seqlen_i2f(feats12),  # seqlen
         fasttext176_i2f(feats13)   # fasttext176 langdetect
     ])
@@ -112,8 +110,7 @@ def get_names():
     names.extend(derechar_names())  # 6
     names.extend(derebigram_names())  # 7
     names.extend(cow_names())  # 8
-    for tmp in smor_names():  # 9/10/11
-        names.extend(tmp)
+    names.extend(smor_names())  # 9
     names.extend(seqlen_names())  # 12
     names.extend(fasttext176_names())  # 13
     return names
