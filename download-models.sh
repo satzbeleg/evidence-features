@@ -53,7 +53,7 @@ if [ ! -f "${MODELFOLDER2}/emoji-sentiment.csv" ]; then
   rm "emoji-sentiment.zip"
   rm "ESR_v1.0_format.txt"
   mv "Emoji_Sentiment_Data_v1.0.csv" "emoji-sentiment.csv"
-  rm "Emojitracker_20150604.csv" "emoji-frequency.csv"
+  mv "Emojitracker_20150604.csv" "emoji-frequency.csv"
 fi
 
 # try last
