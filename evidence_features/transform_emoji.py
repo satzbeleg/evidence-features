@@ -48,15 +48,14 @@ brackets_pos = np.array([0.28449328, 0.4, 0.5, 0.6, 0.71685606, 1.])
 # brackets_neut = np.percentile(
 #     [val.get("neut") for _, val in emojis.items() if val.get("neut") > 0.01],
 #     q=[100 / 6, 100 / 3, 50, 200 / 3, 500 / 6, 100])
-brackets_neut = np.array([0.23561243, 0.3, 0.4 , 0.5, 0.69397993, 1.])
+brackets_neut = np.array([0.23561243, 0.3, 0.4, 0.5, 0.69397993, 1.])
 
 # brackets_freq = np.percentile(
-#     [val.get("freq", 0.0) for _, val in emojis.items() 
+#     [val.get("freq", 0.0) for _, val in emojis.items()
 #      if val.get("freq", 0.0) > 1e-6],
 #     q=[25, 50, 75, 100])
 brackets_freq = np.array([
     6.54701449e-04, 1.98708925e-03, 8.48139347e-03, 1.0])
-
 
 
 def emoji_to_int8(sentences: List[str]):
