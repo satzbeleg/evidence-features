@@ -33,9 +33,17 @@ pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
 The software uses pretrained NLP models and statistics.
 
 ```sh
+# some python package are called
 source .venv/bin/activate
+# set the location for pretrained models and other lists
 export MODELFOLDER="$(pwd)/models"
+# download
 bash download-models.sh
+```
+
+Ensure Debian packages are available
+```sh
+sudo apt install unzip p7zip-full
 ```
 
 If you have access to ZDL's DVC backend, run
@@ -55,7 +63,8 @@ dvc pull
 | lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Lemma frequencies |
 | morphology | [SMOR](https://aclanthology.org/L04-1275/) | Number of morphemes |
 | - | - | Other statistics, e.g., text length |
-| - | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or lang. group |
+| semantics | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or lang. group |
+| semantics | [Emoji Sentiment](https://www.clarin.si/repository/xmlui/handle/11356/1048) | Emoji frequences; Avg., min., max. of pos/neutr/neg emoji sentiment scores; Number of emojis per sentence; type of emoji (e.g., emotion, pictograph, dingbats) |
 
 
 ## Int8 vs floating-point features 

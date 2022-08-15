@@ -54,6 +54,12 @@ from .transform_fasttext176 import (
     fasttext176_names
 )
 
+from .transform_emoji import (
+    emoji_to_float,
+    emoji_to_int8,
+    emoji_names
+)
+
 from .transform_all import (
     to_float,
     to_int,

@@ -62,6 +62,8 @@ def cow_to_int8(sentences: List[str]):
             *cnt.tolist()
         ))
     # done
+    feats = np.maximum(np.iinfo(np.int8).min, feats)
+    feats = np.minimum(np.iinfo(np.int8).max, feats)
     return np.vstack(feats).astype(np.int8)
 
 

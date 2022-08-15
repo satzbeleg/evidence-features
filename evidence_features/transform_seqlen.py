@@ -20,6 +20,8 @@ def seqlen_to_int16(sentences: List[str]):
             len(sent),
             len(words)
         ))
+    feats = np.maximum(np.iinfo(np.int16).min, feats)
+    feats = np.minimum(np.iinfo(np.int16).max, feats)
     return np.vstack(feats).astype(np.int16)
 
 

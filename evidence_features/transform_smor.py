@@ -78,32 +78,28 @@ def get_morphology_distributions(sent):
 
 
 def smor_to_float(sentences: List[str]):
-    feats1, feats2, feats3 = smor_to_int8(sentences)
-    out1 = divide_by_1st_col(feats1)
-    out2 = divide_by_1st_col(feats2)
-    out3 = divide_by_1st_col(feats3)
-    return out1, out2, out3
+    feats = smor_to_int8(sentences)
+    return divide_by_1st_col(feats)
 
 
 def smor_to_int8(sentences: List[str]):
-    feats1 = []
-    feats2 = []
-    feats3 = []
+    feats = []
     for sent in sentences:
         n_token, cnt1, cnt2, cnt3 = get_morphology_distributions(sent)
-        feats1.append((n_token, *cnt1.tolist()))
-        feats2.append((n_token, *cnt2.tolist()))
-        feats3.append((n_token, *cnt3.tolist()))
-    return (
-        np.vstack(feats1).astype(np.int8),
-        np.vstack(feats2).astype(np.int8),
-        np.vstack(feats3).astype(np.int8)
-    )
+        feats.append((
+            n_token,
+            *cnt1.tolist(),
+            *cnt2.tolist(),
+            *cnt3.tolist()
+        ))
+    # done
+    feats = np.maximum(np.iinfo(np.int8).min, feats)
+    feats = np.minimum(np.iinfo(np.int8).max, feats)
+    return np.vstack(feats).astype(np.int8)
 
 
 def smor_names():
-    return (
-        [f"smor_syn_ambiv_{j}" for j in [1, 2, 4, 8, 16, "more"]],
-        [f"smor_lex_ambiv_{j}" for j in [1, 2, 3, "more"]],
-        [f"smor_work_memo_{j}" for j in [1, 2, 3, "more"]]
-    )
+    nam1 = [f"smor_syn_ambiv_{j}" for j in [1, 2, 4, 8, 16, "more"]]
+    nam2 = [f"smor_lex_ambiv_{j}" for j in [1, 2, 3, "more"]]
+    nam3 = [f"smor_work_memo_{j}" for j in [1, 2, 3, "more"]]
+    return nam1 + nam2 + nam3

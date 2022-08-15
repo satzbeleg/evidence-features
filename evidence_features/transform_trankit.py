@@ -180,11 +180,20 @@ def trankit_to_int8(sentences: List[str]):
         feats1.append((num1, *cnt1.tolist()))
         feats2.append((num2, *cnt2.tolist()))
         feats3.append(cnt3.tolist())
-    return (
-        np.vstack(feats1).astype(np.int8),
-        np.vstack(feats2).astype(np.int8),
-        np.vstack(feats3).astype(np.int8)
-    )
+    # 1
+    feats1 = np.maximum(np.iinfo(np.int8).min, feats1)
+    feats1 = np.minimum(np.iinfo(np.int8).max, feats1)
+    feats1 = np.vstack(feats1).astype(np.int8)
+    # 2
+    feats2 = np.maximum(np.iinfo(np.int8).min, feats2)
+    feats2 = np.minimum(np.iinfo(np.int8).max, feats2)
+    feats2 = np.vstack(feats2).astype(np.int8)
+    # 3
+    feats3 = np.maximum(np.iinfo(np.int8).min, feats3)
+    feats3 = np.minimum(np.iinfo(np.int8).max, feats3)
+    feats3 = np.vstack(feats3).astype(np.int8)
+    # done
+    return feats1, feats2, feats3
 
 
 def trankit_names():
