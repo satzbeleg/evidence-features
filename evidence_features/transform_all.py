@@ -44,6 +44,11 @@ from .transform_fasttext176 import (
     fasttext176_i2f,
     fasttext176_names
 )
+from .transform_emoji import (
+    emoji_to_float,
+    emoji_to_int8,
+    emoji_names
+)
 from .utils import (
     divide_by_1st_col,
     divide_by_sum
@@ -62,9 +67,10 @@ def to_float(sentences: List[str]):
     feats9 = smor_to_float(sentences)
     feats12 = seqlen_to_float(sentences)
     feats13 = fasttext176_to_float(sentences)
+    feats14 = emoji_to_float(sentences)
     return np.hstack([
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13
+        feats9, feats12, feats13, feats14
     ])
 
 
@@ -78,14 +84,15 @@ def to_int(sentences: List[str]):
     feats9 = smor_to_int8(sentences)
     feats12 = seqlen_to_int16(sentences)
     feats13 = fasttext176_to_int8(sentences)
+    feats14 = emoji_to_int8(sentences)
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13
+        feats9, feats12, feats13, feats14
     )
 
 
 def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13):
+        feats9, feats12, feats13, feats14):
     return np.hstack([
         sbert_i2b(feats1),  # sbert
         divide_by_1st_col(feats2),  # trankit
@@ -97,7 +104,8 @@ def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
         divide_by_1st_col(feats8),  # cow
         divide_by_1st_col(feats9),  # smor
         seqlen_i2f(feats12),  # seqlen
-        fasttext176_i2f(feats13)   # fasttext176 langdetect
+        fasttext176_i2f(feats13),   # fasttext176 langdetect
+        divide_by_1st_col(feats14)   # emoji
     ])
 
 
@@ -113,4 +121,5 @@ def get_names():
     names.extend(smor_names())  # 9
     names.extend(seqlen_names())  # 12
     names.extend(fasttext176_names())  # 13
+    names.extend(emoji_names())  # 14
     return names

@@ -46,6 +46,16 @@ if [ ! -f "${MODELFOLDER2}/lid.176.ftz" ]; then
   wget -nc -q "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz" -O "lid.176.ftz"
 fi
 
+# Emoji Sentiment
+if [ ! -f "${MODELFOLDER2}/emoji-sentiment.csv" ]; then
+  wget -nc -q "https://www.clarin.si/repository/xmlui/handle/11356/1048/allzip" -O "emoji-sentiment.zip"
+  unzip -n "emoji-sentiment.zip"
+  rm "emoji-sentiment.zip"
+  rm "ESR_v1.0_format.txt"
+  mv "Emoji_Sentiment_Data_v1.0.csv" "emoji-sentiment.csv"
+  rm "Emojitracker_20150604.csv" "emoji-frequency.csv"
+fi
+
 # try last
 # COW lemma frequencies
 if [ ! -f "${MODELFOLDER2}/decow.csv" ]; then
