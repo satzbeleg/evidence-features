@@ -7,7 +7,7 @@
 Linguistic feature extraction for German (lang: de) as 8-bit interger representations.
 
 
-## Install a virtual environment
+## Install a virtual environment for CPU
 
 ```sh
 # Ensure that python packages are availabe
@@ -17,19 +17,46 @@ sudo apt install python3-dev python3-venv
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-# install PyTorch with GPU support for Trankit
-pip install torch==1.7.1+cu110 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
+
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
 # pip install -r requirements-dev.txt --no-cache-dir
 # pip install -r requirements-demo.txt --no-cache-dir
+
+# reinstall TF for better Intel-CPU support
+# pip install intel-tensorflow
 ```
 
 And, or install python package `evidence-features` from Github.
 
 ```sh
 pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
+```
+
+### Install MiniConda for GPU
+TensorFlow needs the CUDA drivers that available as Python packages only via Conda (Nvidia does not maintain PyPi packages).
+
+```sh
+conda install pip
+conda create -y --name gpu-venv-evidence-features python=3.9 pip
+conda activate gpu-venv-evidence-features
+conda install -y -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+pip install torch==1.7.1+cu110 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
+# install other packages
+pip install -e .
+# pip install -r requirements.txt --no-cache-dir
+# pip install -r requirements-dev.txt --no-cache-dir
+pip install -r requirements-demo.txt --no-cache-dir
+```
+
+Install MiniConda if not exists
+```sh
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+# prevent conda autostart in shell
+# conda config --set auto_activate_base false
 ```
 
 
@@ -80,7 +107,10 @@ In case of SBert wer compress the floating-point feature with hashed random proj
 ## Correlation among features
 
 ```sh
-source .venv/bin/activate
+conda activate gpu-venv-evidence-features 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+#source .venv/bin/activate
+
 export MODELFOLDER="$(pwd)/models"
 cd demo/corr
 bash download-corpora.sh
@@ -92,12 +122,16 @@ jupyter lab
 [Sentence embedding evaluation for German](https://github.com/ulf1/sentence-embedding-evaluation-german)
 
 ```sh
-source .venv/bin/activate
+conda activate gpu-venv-evidence-features 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+#source .venv/bin/activate
+
 export MODELFOLDER="$(pwd)/models"
 cd demo/benchmark
 bash download-datasets.sh
 nohup python3 run.py > log.log &
 tail -f log.log
+watch -n 0.5 nvidia-smi
 ```
 
 Balanced F1 scores on the test sets. 
