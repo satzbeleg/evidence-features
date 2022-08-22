@@ -5,6 +5,16 @@ from typing import List
 import sentence_embedding_evaluation_german as seeg
 import evidence_features as evf
 import json
+import numpy as np
+import tensorflow as tf
+
+# prevent TF from grabbing the whole GPU memory
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except:
+    # Invalid device or cannot modify virtual devices once initialized.
+    pass
 
 
 # (2) Specify the preprocessing
