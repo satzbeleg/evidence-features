@@ -11,9 +11,14 @@ import tensorflow as tf
 # prevent TF from grabbing the whole GPU memory
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
-except:
+    tf.config.experimental.set_memory_growth(
+        physical_devices[0], True)
+    tf.config.set_logical_device_configuration(
+        physical_devices[0],
+        [tf.config.LogicalDeviceConfiguration(memory_limit=8192)])
+except Exception as e:
     # Invalid device or cannot modify virtual devices once initialized.
+    print(e)
     pass
 
 
