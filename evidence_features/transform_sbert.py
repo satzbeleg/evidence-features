@@ -3,6 +3,7 @@ import sentence_transformers as sbert
 import keras_hrp as khrp
 import numpy as np
 from typing import List
+import torch
 
 # path to the pretrained sbert model
 MODELPATH = os.getenv("MODELFOLDER", "./models")
@@ -11,7 +12,8 @@ MODELPATH = os.path.join(MODELPATH, "sbert")
 # Load the pretrained model
 model_sbert = sbert.SentenceTransformer(
     'paraphrase-multilingual-MiniLM-L12-v2',
-    cache_folder=MODELPATH
+    cache_folder=MODELPATH,
+    device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 )
 
 # HRP layer
