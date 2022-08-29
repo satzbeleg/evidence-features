@@ -14,13 +14,13 @@ echo "Save models and lists in: ${MODELFOLDER2}"
 if [ ! -d "${MODELFOLDER2}/sbert" ]; then
   export SENTENCE_TRANSFORMERS_HOME="${MODELFOLDER2}/sbert"
   mkdir -p "${SENTENCE_TRANSFORMERS_HOME}"
-  python -c "import sentence_transformers; sentence_transformers.SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')"
+  python -c "import sentence_transformers; import torch; sentence_transformers.SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2', device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))"
 fi
 
 # trankit
 if [ ! -d "${MODELFOLDER2}/trankit" ]; then
   mkdir -p "${MODELFOLDER2}/trankit"
-  python -c "import trankit; trankit.Pipeline(lang='german-hdt', gpu=False, cache_dir='${MODELFOLDER2}/trankit')"
+  python -c "import trankit; import torch; trankit.Pipeline(lang='german-hdt', gpu=torch.cuda.is_available(), cache_dir='${MODELFOLDER2}/trankit')"
 fi
 
 
