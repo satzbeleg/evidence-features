@@ -41,9 +41,8 @@ TensorFlow needs the CUDA drivers that available as Python packages only via Con
 conda install pip
 conda create -y --name gpu-venv-evidence-features python=3.9 pip
 conda activate gpu-venv-evidence-features
-conda install -y -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
+conda install -y pytorch torchvision cudatoolkit=11.2 cudnn=8.1.0 -c pytorch
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-pip install torch==1.7.1+cu110 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir

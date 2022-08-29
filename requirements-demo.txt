@@ -6,4 +6,4 @@ matplotlib
 scikit-learn
 
 # demo/benchmark
-sentence-embedding-evaluation-german
+sentence-embedding-evaluation-german>=0.1.8,<1
