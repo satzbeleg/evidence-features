@@ -35,18 +35,21 @@ pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
 ```
 
 ### Install MiniConda for GPU
-TensorFlow needs the CUDA drivers that available as Python packages only via Conda (Nvidia does not maintain PyPi packages).
+In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not maintain PyPi packages).
 
 ```sh
-conda install pip
+conda install -y pip
 conda create -y --name gpu-venv-evidence-features python=3.9 pip
 conda activate gpu-venv-evidence-features
-conda install -y pytorch torchvision cudatoolkit=11.2 cudnn=8.1.0 -c pytorch
+
+conda install -y cudatoolkit=11.3.1 cudnn=8.3.2 -c conda-forge
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+pip install torch==1.12.1+cu113 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
+
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
-# pip install -r requirements-dev.txt --no-cache-dir
+pip install -r requirements-dev.txt --no-cache-dir
 pip install -r requirements-demo.txt --no-cache-dir
 ```
 
@@ -67,11 +70,16 @@ The software uses pretrained NLP models and statistics.
 sudo apt install unzip p7zip-full
 
 # some python package are called
-source .venv/bin/activate
+conda activate gpu-venv-evidence-features
+# source .venv/bin/activate
+
 # set the location for pretrained models and other lists
 export MODELFOLDER="$(pwd)/models"
 # download
 bash download-models.sh
+
+# run tests
+pytest
 ```
 
 
@@ -108,7 +116,7 @@ In case of SBert wer compress the floating-point feature with hashed random proj
 ```sh
 conda activate gpu-venv-evidence-features 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-#source .venv/bin/activate
+# source .venv/bin/activate
 
 export MODELFOLDER="$(pwd)/models"
 cd demo/corr
@@ -129,6 +137,7 @@ export MODELFOLDER="$(pwd)/models"
 cd demo/benchmark
 bash download-datasets.sh
 nohup python3 run.py > log.log &
+# CUDA_LAUNCH_BLOCKING=1  python3 run.py
 tail -f log.log
 watch -n 0.5 nvidia-smi
 ```
