@@ -41,13 +41,15 @@ In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not
 conda install -y pip
 conda create -y --name gpu-venv-evidence-features python=3.9 pip
 conda activate gpu-venv-evidence-features
-conda install -y cudatoolkit=11.3 cudnn=8.2.1 -c conda-forge
+
+conda install -y cudatoolkit=11.3.1 cudnn=8.3.2 -c conda-forge
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-pip install torch==1.7.1+cu110 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.12.1+cu113 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
+
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
-# pip install -r requirements-dev.txt --no-cache-dir
+pip install -r requirements-dev.txt --no-cache-dir
 pip install -r requirements-demo.txt --no-cache-dir
 ```
 
@@ -75,6 +77,9 @@ conda activate gpu-venv-evidence-features
 export MODELFOLDER="$(pwd)/models"
 # download
 bash download-models.sh
+
+# run tests
+pytest
 ```
 
 
@@ -132,6 +137,7 @@ export MODELFOLDER="$(pwd)/models"
 cd demo/benchmark
 bash download-datasets.sh
 nohup python3 run.py > log.log &
+# CUDA_LAUNCH_BLOCKING=1  python3 run.py
 tail -f log.log
 watch -n 0.5 nvidia-smi
 ```
