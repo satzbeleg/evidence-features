@@ -35,14 +35,15 @@ pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
 ```
 
 ### Install MiniConda for GPU
-TensorFlow needs the CUDA drivers that available as Python packages only via Conda (Nvidia does not maintain PyPi packages).
+In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not maintain PyPi packages).
 
 ```sh
-conda install pip
+conda install -y pip
 conda create -y --name gpu-venv-evidence-features python=3.9 pip
 conda activate gpu-venv-evidence-features
-conda install -y pytorch torchvision cudatoolkit=11.2 cudnn=8.1.0 -c pytorch
+conda install -y cudatoolkit=11.3 cudnn=8.2.1 -c conda-forge
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+pip install torch==1.7.1+cu110 torchvision torchaudio -f https://download.pytorch.org/whl/torch_stable.html
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
@@ -67,7 +68,9 @@ The software uses pretrained NLP models and statistics.
 sudo apt install unzip p7zip-full
 
 # some python package are called
-source .venv/bin/activate
+conda activate gpu-venv-evidence-features
+# source .venv/bin/activate
+
 # set the location for pretrained models and other lists
 export MODELFOLDER="$(pwd)/models"
 # download
@@ -108,7 +111,7 @@ In case of SBert wer compress the floating-point feature with hashed random proj
 ```sh
 conda activate gpu-venv-evidence-features 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-#source .venv/bin/activate
+# source .venv/bin/activate
 
 export MODELFOLDER="$(pwd)/models"
 cd demo/corr
