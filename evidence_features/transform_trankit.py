@@ -168,7 +168,7 @@ def trankit_to_int8(sentences: List[str]):
     feats3 = []
     for sent in sentences:
         try:
-            snt = model_trankit(sent, is_sent=True)
+            snt = model_trankit(sent[:512], is_sent=True)
             num1, cnt1 = get_postag_counts(snt)
             num2, cnt2 = get_morphtag_counts(snt)
             cnt3 = get_nodedist(snt)
