@@ -110,7 +110,8 @@ def int8_to_scaledfloat(idx: np.int8) -> float:
 
 def fasttext176_to_int8(sentences: List[str]):
     # run FastText
-    labels, probas = model_ft176.predict(sentences, k=3)
+    sents = [s.replace("\n"," ") for s in sentences]
+    labels, probas = model_ft176.predict(sents, k=3)
     # assign labels/langs to language groups
     pdf = [lookup_lang(lb, pb.tolist()) for lb, pb in zip(*(labels, probas))]
     # encode to int8
