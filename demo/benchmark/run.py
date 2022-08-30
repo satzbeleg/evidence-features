@@ -38,6 +38,7 @@ params = {
     # 'early_stopping': True,
     # 'split_ratio': 0.2,  # if early_stopping=True
     # 'patience': 5,  # if early_stopping=True
+    'verbose': 1,
 }
 
 
