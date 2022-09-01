@@ -145,17 +145,16 @@ watch -n 0.5 nvidia-smi
 Balanced F1 scores on the test sets. 
 *EV feats.* uses hashed random projections of SBert features,
 i.e., the F1 scores are expected to decrease but not too much.
-Interestingly, Lower German dialect detection (LSDC) does not work at all with *EV feats.*. 
 
 | Task | SBert | EV Feats |
 |---:|---:|---:|
-| FCLAIM | 0.672 | 0.634 |
-|   VMWE | 0.751 | 0.729 |
-| OL19-C | 0.611 | 0.591 |
-| ABSD-2 | 0.521 | 0.514 |
-|  MIO-P | 0.820 | 0.833 |
-|  ARCHI | 0.374 | 0.365 |
-|   LSDC | 0.396 | 0.007 |
+| FCLAIM | 0.672 | 0.632 |
+|   VMWE | 0.751 | 0.730 |
+| OL19-C | 0.611 | 0.598 |
+| ABSD-2 | 0.521 | 0.528 |
+|  MIO-P | 0.820 | 0.844 |
+|  ARCHI | 0.374 | 0.357 |
+|   LSDC | 0.396 | 0.406 |
 
 
 ## Appendix
