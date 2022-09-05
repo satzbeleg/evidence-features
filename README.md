@@ -21,8 +21,8 @@ pip install --upgrade pip
 # install other packages
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
-# pip install -r requirements-dev.txt --no-cache-dir
-# pip install -r requirements-demo.txt --no-cache-dir
+pip install -r requirements-dev.txt --no-cache-dir
+pip install -r requirements-demo.txt --no-cache-dir
 
 # reinstall TF for better Intel-CPU support
 # pip install intel-tensorflow
@@ -89,19 +89,19 @@ If you have access to ZDL's DVC backend, run
 dvc pull
 ```
 
-| Language level | Used models & statistics | Metrics |
-|:---:|:---|:---|
-| semantics | [SBert](http://dx.doi.org/10.18653/v1/D19-1410), `paraphrase-multilingual-MiniLM-L12-v2`; Hashed random projection | Contextual sentence embeddings |
-| syntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, dependency parser; [node-distance](https://doi.org/10.5281/zenodo.5747823) | |
-| morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNLL-U UPOS](https://universaldependencies.org/u/pos/index.html) | Part-of-Speech (PoS) tags |
-| morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNNL-U Universal Features](https://universaldependencies.org/u/feat/index.html) | Other lexical and grammatical properties |
-| phonetics | [epitran](https://aclanthology.org/L18-1429/), `deu-Latn`; [ipasymbols](https://pypi.org/project/ipasymbols/)  | IPA-based consonant clusters |
-| morphology | [DeReChar](https://www.ids-mannheim.de/fileadmin/kl/derewo) | Character and character-level bi-gram frequencies |
-| lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Lemma frequencies |
-| morphology | [SMOR](https://aclanthology.org/L04-1275/) | Number of morphemes |
-| - | - | Other statistics, e.g., text length |
-| semantics | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or lang. group |
-| semantics | [Emoji Sentiment](https://www.clarin.si/repository/xmlui/handle/11356/1048) | Emoji frequences; Avg., min., max. of pos/neutr/neg emoji sentiment scores; Number of emojis per sentence; type of emoji (e.g., emotion, pictograph, dingbats) |
+| Language level | Used models & statistics | Metrics | Dim (as int8) |
+|:---:|:---|:---|:---:|
+| semantics | [SBert](http://dx.doi.org/10.18653/v1/D19-1410), `paraphrase-multilingual-MiniLM-L12-v2`; Hashed random projection | Contextual sentence embeddings | 1024 (128) |
+| morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNLL-U UPOS](https://universaldependencies.org/u/pos/index.html) | Distribution of Part-of-Speech (PoS) tags of a sentence | 16 (17) |
+| morphosyntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, [CoNNL-U Universal Features](https://universaldependencies.org/u/feat/index.html) | Distribution of other lexical and grammatical properties in a sentence | 47 (48) |
+| syntax | [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, dependency parser; [node-distance](https://doi.org/10.5281/zenodo.5747823) | The distribution of the shortest paths between all nodes (word tokens) within the dependency tree of a sentence; adjusted by the visual distance between words. | 21 (21) |
+| phonetics | [epitran](https://aclanthology.org/L18-1429/), `deu-Latn`; [ipasymbols](https://pypi.org/project/ipasymbols/)  | The number of IPA-based consonant clusters within a sentence | 3 (4) |
+| morphology | [DeReChar](https://www.ids-mannheim.de/fileadmin/kl/derewo) | Distribution of character and character-level bi-gram frequencies | 6+10 (7+11) |
+| lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Distribution of lemmata frequencies | 6 (7) |
+| morphology | [SMOR](https://aclanthology.org/L04-1275/) | Occurence of a) all possible parsed variants (syntactial ambivalence), b) all possible unique lexemes (lexeme ambivalence), c) the longest possible lexeme (working memory for composita comprehension) |
+| - | - | Other statistics, e.g., text length | 2 (2) |
+| semantics | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or dialect (de, nds, als, bar) or lang. groups (franconian, north germanic, anglo-friesian, romanic, slavic) | 10 (10) |
+| semantics | [Emoji Sentiment](https://www.clarin.si/repository/xmlui/handle/11356/1048) | Distribution of emoji frequencies, pos., neg., and neutral sentiment for all emojis within a sentence | 22 (23) |
 
 
 ## Int8 vs floating-point features 
