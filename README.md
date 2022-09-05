@@ -63,6 +63,9 @@ bash Miniconda3-latest-Linux-x86_64.sh
 
 
 ## Download pretrained models and statistics
+
+
+### Download from original sources
 The software uses pretrained NLP models and statistics.
 
 ```sh
@@ -82,12 +85,15 @@ bash download-models.sh
 pytest
 ```
 
-
+### Download via DVC Backend
 If you have access to ZDL's DVC backend, run
 
 ```sh
 dvc pull
 ```
+
+### Features Overview
+Currently, 1024 binary and 157 floating-point features are extracted whcih can be stored as 293 int8 elements in a database.
 
 | Language level | Used models & statistics | Metrics | Dim (as int8) |
 |:---:|:---|:---|:---:|
@@ -98,20 +104,22 @@ dvc pull
 | phonetics | [epitran](https://aclanthology.org/L18-1429/), `deu-Latn`; [ipasymbols](https://pypi.org/project/ipasymbols/)  | The number of IPA-based consonant clusters within a sentence | 3 (4) |
 | morphology | [DeReChar](https://www.ids-mannheim.de/fileadmin/kl/derewo) | Distribution of character and character-level bi-gram frequencies | 6+10 (7+11) |
 | lexicology | [COW](https://ids-pub.bsz-bw.de/frontdoor/index/index/year/2015/docId/3836) | Distribution of lemmata frequencies | 6 (7) |
-| morphology | [SMOR](https://aclanthology.org/L04-1275/) | Occurence of a) all possible parsed variants (syntactial ambivalence), b) all possible unique lexemes (lexeme ambivalence), c) the longest possible lexeme (working memory for composita comprehension) |
+| morphology | [SMOR](https://aclanthology.org/L04-1275/) | Occurence of a) all possible parsed variants (syntactial ambivalence), b) all possible unique lexemes (lexeme ambivalence), c) the longest possible lexeme (working memory for composita comprehension) | 14 (15) |
 | - | - | Other statistics, e.g., text length | 2 (2) |
 | semantics | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or dialect (de, nds, als, bar) or lang. groups (franconian, north germanic, anglo-friesian, romanic, slavic) | 10 (10) |
 | semantics | [Emoji Sentiment](https://www.clarin.si/repository/xmlui/handle/11356/1048) | Distribution of emoji frequencies, pos., neg., and neutral sentiment for all emojis within a sentence | 22 (23) |
 
 
-## Int8 vs floating-point features 
+### Int8 vs floating-point features 
 All features are encoded as Int8 features.
 Most features are count data or naturally integer numbers that are transformed to ratios lateron, i.e., we will save 8-bit integers instead of 32-bit floating-points.
 In case of SBert wer compress the floating-point feature with hashed random projections to bit-values that are stored as Int8 representations - The storage requirement can be reduced by factor 12 to 16.
 
 
 
-## Correlation among features
+## Demo Scripts and Notebooks
+
+### Correlation among features
 
 ```sh
 conda activate gpu-venv-evidence-features 
