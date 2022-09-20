@@ -1,7 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/evidence-features.svg)](https://badge.fury.io/py/evidence-features)
 [![PyPi downloads](https://img.shields.io/pypi/dm/evidence-features)](https://img.shields.io/pypi/dm/evidence-features)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/satzbeleg/evidence-features.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/satzbeleg/evidence-features/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/satzbeleg/evidence-features.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/satzbeleg/evidence-features/context:python)
 
 # evidence-features
 Linguistic feature extraction for German (lang: de) as 8-bit interger representations.
@@ -190,6 +188,22 @@ rm -r .pytest_cache
 rm -r .venv
 ```
 
+### Citation
+You can cite the following paper if you want to use this repository in your research work.
+
+```
+@inproceedings{hamster-2022-everybody,
+    title = "Everybody likes short sentences - A Data Analysis for the Text Complexity {DE} Challenge 2022",
+    author = "Hamster, Ulf A.",
+    booktitle = "Proceedings of the GermEval 2022 Workshop on Text Complexity Assessment of German Text",
+    month = sep,
+    year = "2022",
+    address = "Potsdam, Germany",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.germeval-1.2",
+    pages = "10--14",
+}
+```
 
 ### Support
 Please [open an issue](https://github.com/satzbeleg/evidence-features/issues/new) for support.
