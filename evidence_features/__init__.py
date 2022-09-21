@@ -9,7 +9,7 @@ from .transform_sbert import (
 
 from .transform_trankit import (
     trankit_to_float,
-    trankit_to_int8,
+    trankit_to_int,
     trankit_names
 )
 

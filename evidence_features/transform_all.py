@@ -6,7 +6,7 @@ from .transform_sbert import (
 )
 from .transform_trankit import (
     trankit_to_float,
-    trankit_to_int8,
+    trankit_to_int,
     trankit_names
 )
 from .transform_epitran import (
@@ -76,7 +76,7 @@ def to_float(sentences: List[str]):
 
 def to_int(sentences: List[str]):
     feats1 = sbert_to_int8(sentences)
-    feats2, feats3, feats4 = trankit_to_int8(sentences)
+    feats2, feats3, feats4, feats15 = trankit_to_int8(sentences, skipf15=False)
     feats5 = consonant_to_int16(sentences)
     feats6 = derechar_to_int16(sentences)
     feats7 = derebigram_to_int16(sentences)
@@ -87,7 +87,7 @@ def to_int(sentences: List[str]):
     feats14 = emoji_to_int8(sentences)
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14
+        feats9, feats12, feats13, feats14, feats15
     )
 
 

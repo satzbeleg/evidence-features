@@ -109,6 +109,12 @@ Currently, 1024 binary and 157 floating-point features are extracted whcih can b
 | 13 | semantics | [FastText language detection](https://fasttext.cc/docs/en/language-identification.html) | Proba. of language or dialect (de, nds, als, bar) or lang. groups (franconian, north germanic, anglo-friesian, romanic, slavic) | 10 (10) |
 | 14 | semantics | [Emoji Sentiment](https://www.clarin.si/repository/xmlui/handle/11356/1048) | Distribution of emoji frequencies, pos., neg., and neutral sentiment for all emojis within a sentence | 22 (23) |
 
+Not included in `.to_float()`, i.e., only the function `.to_int()` will return these features.
+
+| ID | Language level | Used models & statistics | Metrics | Dim (as int8) |
+|:---:|:---:|:---|:---|:---:|
+| 15 | syntax | MinHash/mmh3 hashes for syntatic similarity. Uses [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, dependency parser; [datasketch.MinHash](http://ekzhu.com/datasketch/minhash.html), [mmh3](https://pypi.org/project/mmh3/), and [treesimi](https://pypi.org/project/treesimi/) | 32x 32-bit Int |
+
 
 ### Int8 vs floating-point features 
 All features are encoded as Int8 features.
