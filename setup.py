@@ -33,6 +33,7 @@ setuptools.setup(
     packages=['evidence_features'],
     install_requires=[
         "numpy>=1.21.6,<2",
+        "cassandra-driver>=3.25.0,<4",
         "sentence-transformers>=2.2.0,<3",
         "keras-hrp>=0.1.0,<1",
         "torch>=1,<2",
