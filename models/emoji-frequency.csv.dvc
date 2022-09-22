@@ -1,0 +1,4 @@
+outs:
+- md5: c31baa1c875a4d4cb203555ad78d7d48
+  size: 16546
+  path: emoji-frequency.csv

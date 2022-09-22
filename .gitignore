@@ -109,7 +109,8 @@ venv.bak/
 profile/data*
 .theia
 
-models
+models/*
+!models/*.dvc
 .DS_Store
 demo/data/*.txt
 demo/*.tar.gz

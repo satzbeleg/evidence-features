@@ -1,6 +1,7 @@
 # general purpose
 numpy>=1.21.6,<2
 torch>=1,<2
+dvc[ssh]>=2,<3
 
 # database backend
 cassandra-driver>=3.25.0,<4

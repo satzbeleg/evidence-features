@@ -1,0 +1,5 @@
+[core]
+    analytics = false
+    remote = zdl
+['remote "zdl"']
+    url = ssh://dvc@lal.dwds.de/home/dvc
