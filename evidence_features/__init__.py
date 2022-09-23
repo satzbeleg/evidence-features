@@ -12,7 +12,9 @@ from .transform_trankit import (
     trankit_to_int,
     trankit_names
 )
-
+from .transform_kshingle import (
+    kshingle_to_int32
+)
 from .transform_epitran import (
     consonant_to_float,
     consonant_to_int16,

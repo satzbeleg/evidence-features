@@ -109,6 +109,7 @@ Not included in `.to_float()`, i.e., only the function `.to_int()` will return t
 | ID | Language level | Used models & statistics | Metrics | Dim (as int8) |
 |:---:|:---:|:---|:---|:---:|
 | 15 | syntax | Uses [Trankit](http://dx.doi.org/10.18653/v1/2021.eacl-demos.10), `german-hdt`, dependency parser; [datasketch.MinHash](http://ekzhu.com/datasketch/minhash.html), [mmh3](https://pypi.org/project/mmh3/), and [treesimi](https://pypi.org/project/treesimi/) | MinHash/mmh3 hashes for syntatic similarity | 32x Int32 (128 bytes) |
+| 16 | - | Uses [datasketch.MinHash](http://ekzhu.com/datasketch/minhash.html), [mmh3](https://pypi.org/project/mmh3/), and [kshingle](https://pypi.org/project/kshingle/) | MinHash/mmh3 hashes for Near Duplicate Detection | 32x Int32 (128 bytes) |
 
 
 ### Int8 vs floating-point features 

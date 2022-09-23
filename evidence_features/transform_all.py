@@ -9,6 +9,9 @@ from .transform_trankit import (
     trankit_to_int,
     trankit_names
 )
+from .transform_kshingle import (
+    kshingle_to_int32
+)
 from .transform_epitran import (
     consonant_to_float,
     consonant_to_int16,
@@ -85,9 +88,10 @@ def to_int(sentences: List[str]):
     feats12 = seqlen_to_int16(sentences)
     feats13 = fasttext176_to_int8(sentences)
     feats14 = emoji_to_int8(sentences)
+    feats16 = kshingle_to_int32(sentences)
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14, feats15
+        feats9, feats12, feats13, feats14, feats15, feats16
     )
 
 

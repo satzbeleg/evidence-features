@@ -225,13 +225,13 @@ def trankit_to_int(sentences: List[str], skipf15=True):
             num2, cnt2 = 0, np.zeros((len(MORPHTAGS),), dtype=np.int8)
             cnt3 = np.array([0 for _ in range(21)])
             if not skipf15:
-                hash15 = np.array([0 for _ in range(32)])
+                hash15 = [0 for _ in range(32)]
             print(e)
         feats1.append((num1, *cnt1.tolist()))
         feats2.append((num2, *cnt2.tolist()))
         feats3.append(cnt3.tolist())
         if not skipf15:
-            feats15.append(hash15.tolist())
+            feats15.append(hash15)
     # 1
     feats1 = np.maximum(np.iinfo(np.int8).min, feats1)
     feats1 = np.minimum(np.iinfo(np.int8).max, feats1)
