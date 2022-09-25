@@ -1,0 +1,4 @@
+outs:
+- md5: 97acdf6adfe05caf30e15a05b0767591
+  size: 78880
+  path: emoji-sentiment.csv
