@@ -175,8 +175,8 @@ def hashfunc_mmh3_int32(data: bytes) -> np.uint32:
 def get_treesimi_hashes(snt) -> List[np.int32]:
     # parse trankit sentence
     adjac = [(t.get("id"), t.get("head"), t.get("deprel"))
-              for t in snt.get("tokens")
-              if isinstance(t.get("id"), int)]
+             for t in snt.get("tokens")
+             if isinstance(t.get("id"), int)]
     # adjust trankit IDs
     d = min([c for c, _, __ in adjac]) - 1
     adjac = [(c - d, max(0, p - d), m) for c, p, m in adjac]
@@ -201,7 +201,7 @@ def get_treesimi_hashes(snt) -> List[np.int32]:
 
 def get_lemmata(snt, upos_list=["NOUN", "VERB", "ADJ"]):
     return [t.get("lemma") for t in snt.get("tokens")
-            if t.get("upos") in upos_list]  
+            if t.get("upos") in upos_list]
 
 
 def trankit_to_float(sentences: List[str]):
@@ -262,6 +262,7 @@ def trankit_to_int(sentences: List[str], skiphash=True):
         return feats1, feats2, feats3
     else:
         return feats1, feats2, feats3, hashes15, lemmata17
+
 
 def trankit_names():
     return (

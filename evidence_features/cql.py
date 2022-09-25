@@ -24,13 +24,14 @@ cas_exec_profile = cas.cluster.ExecutionProfile(
     # row_factory=
 )
 
+
 class CqlConn:
     def __init__(self,
                  keyspace: str,
                  reset_tables: bool = False,
                  port: int = 9042,
                  contact_points=['0.0.0.0']
-                ):
+                 ):
         """ connect to Cassandra cluster """
         # connect to cluster
         self.cluster = cas.cluster.Cluster(
@@ -151,8 +152,8 @@ def handle_err(err, headword=None):
 
 def insert_sentences(session: cas.cluster.Session,
                      sentences: List[str],
-                     max_chars = 2048,
-                     num_partitions = 128):
+                     max_chars: int = 2048,
+                     num_partitions: int = 128):
     # encode features
     (
         f1, f2, f3, f4, f5, f6, f7, f8,
@@ -187,8 +188,6 @@ def insert_sentences(session: cas.cluster.Session,
     for i, text in enumerate(sentences):
         # chop sentence length to `max_chars`
         text = text[:max_chars]
-        # count number of chars
-        num_chars = min(max_chars, len(text))
         # skip all sentences with less than 3 tokens
         if len(text.split(" ")) < 3:
             logger.warning(f"Sentence to short: '{text}'")
