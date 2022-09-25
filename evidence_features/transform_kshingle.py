@@ -27,12 +27,12 @@ def get_kshingle_hashes(text: str) -> List[np.int32]:
 
 
 def kshingle_to_int32(sentences: List[str]):
-    feats16 = []
+    hashes16 = []
     for text in sentences:
         try:
             hash16 = get_kshingle_hashes(text)
         except Exception as e:
             hash16 = [0 for _ in range(32)]
             print(e)
-        feats16.append(hash16)
-    return np.vstack(feats16).astype(np.int32)
+        hashes16.append(hash16)
+    return np.vstack(hashes16).astype(np.int32)

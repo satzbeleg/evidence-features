@@ -72,14 +72,16 @@ def to_float(sentences: List[str]):
     feats13 = fasttext176_to_float(sentences)
     feats14 = emoji_to_float(sentences)
     return np.hstack([
-        feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
+        feats1, feats2, feats3, feats4,
+        feats5, feats6, feats7, feats8,
         feats9, feats12, feats13, feats14
     ])
 
 
 def to_int(sentences: List[str]):
     feats1 = sbert_to_int8(sentences)
-    feats2, feats3, feats4, feats15 = trankit_to_int8(sentences, skipf15=False)
+    feats2, feats3, feats4, hashes15, lemmata17 = trankit_to_int(
+        sentences, skiphash=False)
     feats5 = consonant_to_int16(sentences)
     feats6 = derechar_to_int16(sentences)
     feats7 = derebigram_to_int16(sentences)
@@ -88,15 +90,31 @@ def to_int(sentences: List[str]):
     feats12 = seqlen_to_int16(sentences)
     feats13 = fasttext176_to_int8(sentences)
     feats14 = emoji_to_int8(sentences)
-    feats16 = kshingle_to_int32(sentences)
+    hashes16 = kshingle_to_int32(sentences)
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14, feats15, feats16
+        feats9, feats12, feats13, feats14,
+        hashes15, hashes16, lemmata17
     )
 
 
-def i2f(feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
+def i2f(feats1, feats2, feats3, feats4,
+        feats5, feats6, feats7, feats8,
         feats9, feats12, feats13, feats14):
+    # convert to numpy
+    feats1 = np.array(feats1, dtype=np.int8)
+    feats2 = np.array(feats2, dtype=np.int8)
+    feats3 = np.array(feats3, dtype=np.int8)
+    feats4 = np.array(feats4, dtype=np.int8)
+    feats5 = np.array(feats5, dtype=np.int16)
+    feats6 = np.array(feats6, dtype=np.int16)
+    feats7 = np.array(feats7, dtype=np.int16)
+    feats8 = np.array(feats8, dtype=np.int8)
+    feats9 = np.array(feats9, dtype=np.int8)
+    feats12 = np.array(feats12, dtype=np.int16)
+    feats13 = np.array(feats13, dtype=np.int8)
+    feats14 = np.array(feats14, dtype=np.int8)
+    # convert to floating-point features
     return np.hstack([
         sbert_i2b(feats1),  # sbert
         divide_by_1st_col(feats2),  # trankit

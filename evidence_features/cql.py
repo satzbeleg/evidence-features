@@ -5,33 +5,47 @@ import cassandra.query
 import cassandra.policies
 import gc
 import numpy as np
+from typing import List
+import itertools
+from .transform_all import to_int, i2f
+from .transform_sbert import sbert_i2b
+
 
 # start logger
 logger = logging.getLogger(__name__)
 
 
+cas_exec_profile = cas.cluster.ExecutionProfile(
+    load_balancing_policy=cas.policies.RoundRobinPolicy(),
+    request_timeout=None,  # disable query timeout
+    # retry_policy=,
+    # consistency_level=,
+    # serial_consistency_level=,
+    # row_factory=
+)
+
 class CqlConn:
     def __init__(self,
                  keyspace: str,
-                 reset_tables: bool = False):
+                 reset_tables: bool = False,
+                 port: int = 9042,
+                 contact_points=['0.0.0.0']
+                ):
         """ connect to Cassandra cluster """
         # connect to cluster
         self.cluster = cas.cluster.Cluster(
-            contact_points=['0.0.0.0'],
-            port=9042,
+            contact_points=contact_points,
+            port=port,
             protocol_version=5,
             idle_heartbeat_interval=0,
-            load_balancing_policy=cas.policies.RoundRobinPolicy(),
             reconnection_policy=cas.policies.ConstantReconnectionPolicy(
                 1, None),
-            # default_retry_policy=KeepTryingRetryPolicy(),
-            # conviction_policy_factory=NeverConvictionPolicy  # doesn't work
+            execution_profiles={
+                cas.cluster.EXEC_PROFILE_DEFAULT: cas_exec_profile},
         )
         # open an connection
         self.session = self.cluster.connect(
             wait_for_all_pools=False)
-        # disable query timeout (` ResponseFuture.result()`, `cas.ReadTimeout`)
-        self.session.default_timeout = None
         # create keyspace and its tables IF NOT EXISTS
         _cas_init_tables(self.session, keyspace, reset_tables)
         # set `USE keyspace;`
@@ -106,29 +120,103 @@ def _cas_init_tables(session: cas.cluster.Session,
 
     # create tables if not exist
     session.execute(f"""
-    CREATE TABLE IF NOT EXISTS {keyspace}.dataset (
-      lemma     TEXT
+    CREATE TABLE IF NOT EXISTS {keyspace}.tbl_features (
+      headword  TEXT
     , sentence  TEXT
     , feats1   frozen<list<TINYINT>>
     , feats2   frozen<list<TINYINT>>
     , feats3   frozen<list<TINYINT>>
     , feats4   frozen<list<TINYINT>>
-    , feats5   frozen<list<TINYINT>>
-    , feats6   frozen<list<TINYINT>>
-    , feats7   frozen<list<TINYINT>>
+    , feats5   frozen<list<SMALLINT>>
+    , feats6   frozen<list<SMALLINT>>
+    , feats7   frozen<list<SMALLINT>>
     , feats8   frozen<list<TINYINT>>
     , feats9   frozen<list<TINYINT>>
-    , feats12  frozen<list<TINYINT>>
+    , feats12  frozen<list<SMALLINT>>
     , feats13  frozen<list<TINYINT>>
     , feats14  frozen<list<TINYINT>>
-    , PRIMARY KEY (lemma, sentence)
+    , feats15  frozen<list<INT>>
+    , feats16  frozen<list<INT>>
+    , PRIMARY KEY ((headword), sentence)
     );
     """)
     pass
 
 
-def _cas_get_lemmata(session: cas.cluster.Session,
-                     max_fetch_size: int = 1000000):
+# error logger
+def handle_err(err, headword=None):
+    logger.error(
+        f"Insertion error for headword='{headword}'")
+
+
+def insert_sentences(session: cas.cluster.Session,
+                     sentences: List[str],
+                     max_chars = 2048,
+                     num_partitions = 128):
+    # encode features
+    (
+        f1, f2, f3, f4, f5, f6, f7, f8,
+        f9, f12, f13, f14,
+        h15, h16, l17
+    ) = to_int(sentences)
+
+    # get headwords
+    headwords = list(set(itertools.chain(*l17)))
+    if len(headwords) == 0:
+        logger.warning("No headwords found")
+        pass
+
+    # prepare statement
+    stmt = session.prepare(f"""
+    INSERT INTO {session.keyspace}.tbl_features
+    (headword, sentence,
+    feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
+    feats9, feats12, feats13, feats14, feats15, feats16)
+    VALUES (?, ?,  ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?)
+    IF NOT EXISTS;
+    """)
+
+    # prepare batch statement
+    batches = {
+        k: cas.query.BatchStatement(
+            consistency_level=cas.query.ConsistencyLevel.ANY)
+        for k in headwords
+    }
+
+    # loop over each sentence
+    for i, text in enumerate(sentences):
+        # chop sentence length to `max_chars`
+        text = text[:max_chars]
+        # count number of chars
+        num_chars = min(max_chars, len(text))
+        # skip all sentences with less than 3 tokens
+        if len(text.split(" ")) < 3:
+            logger.warning(f"Sentence to short: '{text}'")
+            continue
+        # skip if no headword was found
+        if len(l17[i]) == 0:
+            logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
+            continue
+        # save a row for each headword
+        for headword in l17[i]:
+            # add to batch
+            batches[headword].add(stmt, [
+                headword, text,
+                f1[i], f2[i], f3[i], f4[i], f5[i], f6[i], f7[i], f8[i],
+                f9[i], f12[i], f13[i], f14[i], h15[i], h16[i]
+            ])
+
+    # execute
+    for headword, batch in batches.items():
+        if len(batch) > 0:
+            fb = session.execute_async(batch)
+            fb.add_errback(handle_err, headword=headword)
+    # done
+    pass
+
+
+def get_headwords(session: cas.cluster.Session,
+                  max_fetch_size: int = 1000000):
     """ Lookup all unique lemmata from CQL database
 
     Parameters:
@@ -143,128 +231,97 @@ def _cas_get_lemmata(session: cas.cluster.Session,
 
     Example:
     --------
-    import evidence_model as ev
-    import evidence_model.dataset
-    conn = ev.dataset.CqlConn(keyspace="toydata")
-    lemmata = ev.datatset._cas_get_lemmata(
+    import evidence_features as evf
+    import evidence_features.cql
+    conn = evf.cql.CqlConn(keyspace="evidence")
+    headwords = evf.cql.cas_get_headwords(
         conn.get_session(), max_fetch_size=5000)
     """
     stmt = cas.query.SimpleStatement(
-        "SELECT DISTINCT lemma FROM dataset",
+        f"SELECT DISTINCT headword FROM {session.keyspace}.tbl_features",
         fetch_size=max_fetch_size)
     # fetch from CQL
-    ulemmata = []
+    headwords = []
     for row in session.execute(stmt):
-        ulemmata.append(row.lemma)
-    ulemmata = list(set(ulemmata))
+        headwords.append(row.headword)
+    headwords = list(set(headwords))
     # clean up
     del stmt
     gc.collect()
     # done
-    return ulemmata
+    return headwords
 
 
-def _cas_download_partitions(session: cas.cluster.Session,
-                             lemmata: List[str],
-                             max_lemmata: int = 100,
-                             row_limit: int = 5000):
-    """ Sample lemmata and download their CQL paritions into RAM
-
-    Parameters:
-    -----------
-    session : cas.cluster.Session
-        A Cassandra Session object, i.e., an existing DB connection.
-        The session must have a default keyspace, i.e., `USE keyspace;`
-        or `session.set_keyspace(keyspace)`.
-
-    lemmata : List[str]
-        List of available lemmata
-
-    max_lemmata : int (Default: 100)
-        The maximum number lemmata to use. It's also the max. number of
-          CQL partitions to access.
-        (ignored if set to max_lemmata='all')
-
-    row_limit : int (Default: int(5e5))
-        Maximum number of examples/rows to fetch for each partition.
-
-    Example:
-    --------
-    import evidence_model as ev
-    import evidence_model.dataset
-    conn = ev.dataset.CqlConn(keyspace="demodata")
-    lemmata = ev.dataset._cas_get_lemmata(
-        conn.get_session(), max_fetch_size=5000)
-    sampled_partions = ev.dataset._cas_download_partitions(
-        conn.get_session(), lemmata, max_lemmata=60)
-    assert len(sampled_partions) == min(len(lemmata), 60)
-    """
+def download_similarity_features(session: cas.cluster.Session,
+                                 headword: str,
+                                 max_fetch_size: int = 1000000):
     # prepare statement
-    stmt = session.prepare(f"""
-    SELECT sentence, feats1, feats2, feats3, feats4, feats5, feats6, feats9,
-          , feats12, feats13, feats14
-    FROM dataset WHERE lemma=?
-    LIMIT {row_limit} ; """)
-
-    # sample lemmata
-    if max_lemmata == 'all':
-        sampled_lemmata = lemmata.copy()
-    else:
-        sampled_lemmata = np.random.choice(
-            lemmata, size=min(len(lemmata), max_lemmata),
-            replace=False).tolist()
-
-    # loop over responses
-    sampled_partions = []
-    err_counter = 0
-    while err_counter < 5:
-        if len(sampled_lemmata) == 0:
-            break
-        lemma = sampled_lemmata[0]
-        sampled_lemmata.remove(lemma)
-        try:
-            # fetch lemma partition
-            dat = session.execute(stmt, [lemma])
-            # read data and convert directly to float-point representation
-            # bucket, hashvalue, augm = [], [], []
-            # for row in dat:
-            #     if row.bucket is None:
-            #         continue
-            #     if not isinstance(row.bucket, int):
-            #         continue
-            #     if row.hashvalue is None:
-            #         continue
-            #     num_enc8 = len(row.hashvalue)
-            #     if num_enc8 == 0:
-            #         continue
-            #     if row.augmentations is None:
-            #         continue
-            #     if len(row.augmentations) == 0:
-            #         continue
-            #     tmp = [a for a in row.augmentations if len(a) == num_enc8]
-            #     if len(tmp) == 0:
-            #         continue
-            #     # cast and save
-            #     bucket.append(int(row.bucket))
-            #     hashvalue.append(np.array(row.hashvalue).astype(np.int8))
-            #     augm.append(np.array(tmp).astype(np.int8))
-            # append to variable in RAM
-            if (len(bucket) > 0) and (len(hashvalue) > 0) and (len(augm) > 0):
-                sampled_partions.append((bucket, hashvalue, augm))
-            err_counter = 0
-            del dat, bucket, hashvalue, augm
-            gc.collect()
-        except cas.ReadTimeout as e:
-            logger.error(f"Read Timeout problems with '{lemma}': {e}")
-            err_counter += 1
-            time.sleep(2.0)
-        except Exception as e:
-            logger.error(f"Unknown problems with '{lemma}': {e}")
-            err_counter += 1
-            time.sleep(3.0)
+    stmt = cas.query.SimpleStatement(f"""
+        SELECT sentence, feats1, feats15, feats16
+        FROM {session.keyspace}.tbl_features
+        WHERE headword='{headword}';
+        """, fetch_size=max_fetch_size)
+    # read fetched rows
+    sentences = []
+    feats_semantic = []
+    feats_grammar = []
+    feats_duplicate = []
+    for row in session.execute(stmt):
+        sentences.append(row.sentence)
+        feats_semantic.append(row.feats1)
+        feats_grammar.append(row.feats15)
+        feats_duplicate.append(row.feats16)
+    # convert and enforce data type
+    feats_semantic = sbert_i2b(np.array(feats_semantic, dtype=np.int8))
+    feats_grammar = np.array(feats_grammar, dtype=np.int32)
+    feats_duplicate = np.array(feats_duplicate, dtype=np.int32)
     # clean up
-    del stmt, sampled_lemmata
+    del stmt
     gc.collect()
     # done
-    return sampled_partions
+    return sentences, feats_semantic, feats_grammar, feats_duplicate
 
+
+def download_scoring_features(session: cas.cluster.Session,
+                              headword: str,
+                              max_fetch_size: int = 1000000):
+    # prepare statement
+    stmt = cas.query.SimpleStatement(f"""
+        SELECT feats1, feats2, feats3, feats4,
+               feats5, feats6, feats7, feats8,
+               feats9, feats12, feats13, feats14, sentence
+        FROM {session.keyspace}.tbl_features
+        WHERE headword='{headword}';
+        """, fetch_size=max_fetch_size)
+    # read fetched rows
+    sentences = []
+    feats1, feats2, feats3, feats4 = [], [], [], []
+    feats5, feats6, feats7, feats8 = [], [], [], []
+    feats9, feats12, feats13, feats14 = [], [], [], []
+    for row in session.execute(stmt):
+        sentences.append(row.sentence)
+        feats1.append(row.feats1)
+        feats2.append(row.feats2)
+        feats3.append(row.feats3)
+        feats4.append(row.feats4)
+        feats5.append(row.feats5)
+        feats6.append(row.feats6)
+        feats7.append(row.feats7)
+        feats8.append(row.feats8)
+        feats9.append(row.feats9)
+        feats12.append(row.feats12)
+        feats13.append(row.feats13)
+        feats14.append(row.feats14)
+    # convert to float
+    feats = i2f(
+        feats1, feats2, feats3, feats4,
+        feats5, feats6, feats7, feats8,
+        feats9, feats12, feats13, feats14
+    ).astype(np.float32)
+    # clean up
+    del stmt, feats1, feats2, feats3, feats4
+    del feats5, feats6, feats7, feats8
+    del feats9, feats12, feats13, feats14
+    gc.collect()
+    # done
+    return sentences, feats
