@@ -192,6 +192,22 @@ rm -r .pytest_cache
 rm -r .venv
 ```
 
+### Citation
+You can cite the following paper if you want to use this repository in your research work.
+
+```
+@inproceedings{hamster-2022-everybody,
+    title = "Everybody likes short sentences - A Data Analysis for the Text Complexity {DE} Challenge 2022",
+    author = "Hamster, Ulf A.",
+    booktitle = "Proceedings of the GermEval 2022 Workshop on Text Complexity Assessment of German Text",
+    month = sep,
+    year = "2022",
+    address = "Potsdam, Germany",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.germeval-1.2",
+    pages = "10--14",
+}
+```
 
 ### Support
 Please [open an issue](https://github.com/satzbeleg/evidence-features/issues/new) for support.
