@@ -15,7 +15,7 @@ trankit>=1.1.1,<2
 node-distance>=0.1.0,<1
 
 # IPA consonant clusters (phonetics)
-epitran>=1.18,<2
+epitran>=1.18,<=1.22
 ipasymbols>=0.0.1,<1
 
 # SMOR (morphology)

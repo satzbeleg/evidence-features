@@ -40,7 +40,7 @@ setuptools.setup(
         "torch>=1,<2",
         "trankit>=1.1.1,<2",
         "node-distance>=0.1.0,<1",
-        "epitran>=1.18,<2",
+        "epitran>=1.18,<=1.22",
         "ipasymbols>=0.0.1,<1",
         "sfst-transduce>=1.0.1,<2",
         "nltk>=3.7,<4",
