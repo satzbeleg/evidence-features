@@ -58,7 +58,7 @@ fi
 
 # try last
 # COW lemma frequencies
-if [ ! -f "${MODELFOLDER2}/decow.csv" ]; then
+if [ ! -f "${MODELFOLDER2}/decow.json" ]; then
   wget -nc -q "https://nlp-data-filestorage.s3.eu-central-1.amazonaws.com/word-frequencies/decow_wordfreq_cistem.csv.7z"
   p7zip -d "decow_wordfreq_cistem.csv.7z"
   mv decow_wordfreq_cistem.csv decow.csv
