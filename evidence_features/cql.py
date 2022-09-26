@@ -9,6 +9,7 @@ from typing import List
 import itertools
 from .transform_all import to_int, i2f
 from .transform_sbert import sbert_i2b
+from .transform_kshingle import kshingle_to_int32
 
 
 # start logger
@@ -124,6 +125,8 @@ def _cas_init_tables(session: cas.cluster.Session,
     CREATE TABLE IF NOT EXISTS {keyspace}.tbl_features (
       headword  TEXT
     , sentence  TEXT
+    , biblio   TEXT
+    , score    FLOAT
     , feats1   frozen<list<TINYINT>>
     , feats2   frozen<list<TINYINT>>
     , feats3   frozen<list<TINYINT>>
@@ -136,8 +139,9 @@ def _cas_init_tables(session: cas.cluster.Session,
     , feats12  frozen<list<SMALLINT>>
     , feats13  frozen<list<TINYINT>>
     , feats14  frozen<list<TINYINT>>
-    , feats15  frozen<list<INT>>
-    , feats16  frozen<list<INT>>
+    , hashes15  frozen<list<INT>>
+    , hashes16  frozen<list<INT>>
+    , hashes18  frozen<list<INT>>
     , PRIMARY KEY ((headword), sentence)
     );
     """)
@@ -153,13 +157,26 @@ def handle_err(err, headword=None):
 def insert_sentences(session: cas.cluster.Session,
                      sentences: List[str],
                      max_chars: int = 2048,
-                     num_partitions: int = 128):
+                     num_partitions: int = 128,
+                     scores: List[float] = None,
+                     biblio: List[str] = None):
     # encode features
     (
         f1, f2, f3, f4, f5, f6, f7, f8,
         f9, f12, f13, f14,
         h15, h16, l17
     ) = to_int(sentences)
+    
+    # encode bibliographic information if exists
+    if biblio is not None:
+        h18 = kshingle_to_int32(biblio)
+    else:
+        h18 = [[0] * 32] * len(sentences)
+        biblio = [""] * len(sentences)
+
+    # check scores
+    if scores is None:
+        scores = [np.nan] * len(sentences)
 
     # get headwords
     headwords = list(set(itertools.chain(*l17)))
@@ -170,10 +187,12 @@ def insert_sentences(session: cas.cluster.Session,
     # prepare statement
     stmt = session.prepare(f"""
     INSERT INTO {session.keyspace}.tbl_features
-    (headword, sentence,
-    feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-    feats9, feats12, feats13, feats14, feats15, feats16)
-    VALUES (?, ?,  ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?)
+    (headword, sentence, biblio, score,
+    feats1, feats2, feats3, feats4, 
+    feats5, feats6, feats7, feats8,
+    feats9, feats12, feats13, feats14, 
+    hashes15, hashes16, hashes18)
+    VALUES (?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,  ?, ?, ?)
     IF NOT EXISTS;
     """)
 
@@ -200,9 +219,11 @@ def insert_sentences(session: cas.cluster.Session,
         for headword in l17[i]:
             # add to batch
             batches[headword].add(stmt, [
-                headword, text,
-                f1[i], f2[i], f3[i], f4[i], f5[i], f6[i], f7[i], f8[i],
-                f9[i], f12[i], f13[i], f14[i], h15[i], h16[i]
+                headword, text, biblio[i], scores[i],
+                f1[i], f2[i], f3[i], f4[i], 
+                f5[i], f6[i], f7[i], f8[i],
+                f9[i], f12[i], f13[i], f14[i], 
+                h15[i], h16[i], h18[i]
             ])
 
     # execute
@@ -256,29 +277,40 @@ def download_similarity_features(session: cas.cluster.Session,
                                  max_fetch_size: int = 1000000):
     # prepare statement
     stmt = cas.query.SimpleStatement(f"""
-        SELECT sentence, feats1, feats15, feats16
+        SELECT sentence, biblio, score,
+               feats1, hashes15, hashes16, hashes18
         FROM {session.keyspace}.tbl_features
         WHERE headword='{headword}';
         """, fetch_size=max_fetch_size)
     # read fetched rows
     sentences = []
+    biblio = []
+    scores = []
     feats_semantic = []
-    feats_grammar = []
-    feats_duplicate = []
+    hashes_grammar = []
+    hashes_duplicate = []
+    hashes_biblio = []
     for row in session.execute(stmt):
         sentences.append(row.sentence)
+        biblio.append(row.biblio)
+        scores.append(row.score)
         feats_semantic.append(row.feats1)
-        feats_grammar.append(row.feats15)
-        feats_duplicate.append(row.feats16)
+        hashes_grammar.append(row.hashes15)
+        hashes_duplicate.append(row.hashes16)
+        hashes_biblio.append(row.hashes18)
     # convert and enforce data type
     feats_semantic = sbert_i2b(np.array(feats_semantic, dtype=np.int8))
-    feats_grammar = np.array(feats_grammar, dtype=np.int32)
-    feats_duplicate = np.array(feats_duplicate, dtype=np.int32)
+    hashes_grammar = np.array(hashes_grammar, dtype=np.int32)
+    hashes_duplicate = np.array(hashes_duplicate, dtype=np.int32)
+    hashes_biblio = np.array(hashes_biblio, dtype=np.int32)
     # clean up
     del stmt
     gc.collect()
     # done
-    return sentences, feats_semantic, feats_grammar, feats_duplicate
+    return (
+        sentences, biblio, scores,
+        feats_semantic, hashes_grammar, hashes_duplicate, hashes_biblio
+    )
 
 
 def download_scoring_features(session: cas.cluster.Session,

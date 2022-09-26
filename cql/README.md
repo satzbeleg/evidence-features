@@ -45,7 +45,8 @@ headwords = evf.cql.get_headwords(session)
 
 # download partition for variations
 (
-    sentences2, feats_semantic, feats_grammar, feats_duplicate
+    sentences2, biblio, scores, 
+    feats_semantic, hashes_grammar, hashes_duplicate, hashes_biblio
 ) = evf.cql.download_similarity_features(session, headword="Beispiel")
 # np.mean(feats_duplicate[0] == feats_duplicate[1])
 
