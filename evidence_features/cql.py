@@ -125,6 +125,8 @@ def _cas_init_tables(session: cas.cluster.Session,
     CREATE TABLE IF NOT EXISTS {keyspace}.tbl_features (
       headword  TEXT
     , sentence  TEXT
+    , spans    frozen<list<frozen<list<SMALLINT>>>>
+    , annot    TEXT
     , biblio   TEXT
     , score    FLOAT
     , feats1   frozen<list<TINYINT>>
