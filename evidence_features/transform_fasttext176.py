@@ -9,7 +9,9 @@ MODELPATH = os.getenv("MODELFOLDER", "./models")
 MODELPATH = os.path.join(MODELPATH, "lid.176.ftz")
 
 # load model once
-model_ft176 = fasttext.load_model(MODELPATH)
+# model_ft176 = fasttext.load_model(MODELPATH)
+# see https://github.com/facebookresearch/fastText/issues/1056
+model_ft176 = fasttext.FastText._FastText(model_path=MODELPATH)
 
 #
 # German Dialects - werden gut erkannt
