@@ -14,10 +14,10 @@ source .venv/bin/activate
 pip install --upgrade pip
 
 # install other packages
-pip install -e .
-# pip install -r requirements.txt --no-cache-dir
-pip install -r requirements-dev.txt --no-cache-dir
-pip install -r requirements-demo.txt --no-cache-dir
+pip install --use-pep517 -e .
+# pip install --use-pep517 -r requirements.txt --no-cache-dir
+pip install --use-pep517 -r requirements-dev.txt --no-cache-dir
+pip install --use-pep517 -r requirements-demo.txt --no-cache-dir
 
 # reinstall TF for better Intel-CPU support
 # pip install intel-tensorflow

@@ -234,12 +234,12 @@ def insert_sentences(session: cas.cluster.Session,
             logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
             continue
         # generate UUID on the fly
-        example_id = str(uuid.uuid4())
+        example_id = uuid.uuid4()
         # save a row for each headword
         for headword in l17[i]:
             # add to batch
             batches[headword].add(stmt, [
-                headword, example_id, text, sent_ids[i], 
+                headword, example_id, text, uuid.UUID(sent_ids[i]), 
                 spans[i], annot[i], biblio[i], licensetext[i], scores[i],
                 f1[i], f2[i], f3[i], f4[i], 
                 f5[i], f6[i], f7[i], f8[i],
