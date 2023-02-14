@@ -6,10 +6,10 @@ Linguistic feature extraction for German (lang: de) as 8-bit interger representa
 
 ```sh
 # Ensure that python packages are availabe
-sudo apt install python3-dev python3-venv
+sudo apt install python3.9-dev python3-venv
 
 # install virtualenv
-python3 -m venv .venv
+python3.9 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 
@@ -31,6 +31,11 @@ pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
 
 ### Install MiniConda for GPU
 In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not maintain PyPi packages).
+
+```sh
+# fasttext requires `python3.9-dev`
+sudo apt install python3.9-dev
+```
 
 ```sh
 conda install -y pip

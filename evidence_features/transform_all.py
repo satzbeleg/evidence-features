@@ -80,7 +80,10 @@ def to_float(sentences: List[str]):
 
 def to_int(sentences: List[str]):
     feats1 = sbert_to_int8(sentences)
-    feats2, feats3, feats4, hashes15, lemmata17 = trankit_to_int(
+    (
+        feats2, feats3, feats4, hashes15,
+        lemmata17, spans, annotations
+    ) = trankit_to_int(
         sentences, skiphash=False)
     feats5 = consonant_to_int16(sentences)
     feats6 = derechar_to_int16(sentences)
@@ -94,7 +97,7 @@ def to_int(sentences: List[str]):
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
         feats9, feats12, feats13, feats14,
-        hashes15, hashes16, lemmata17
+        hashes15, hashes16, lemmata17, spans, annotations
     )
 
 

@@ -204,6 +204,17 @@ def get_lemmata(snt, upos_list=["NOUN", "VERB", "ADJ"]):
             if t.get("upos") in upos_list]
 
 
+def get_span(snt, upos_list=["NOUN", "VERB", "ADJ"]):
+    return [t.get("span") for t in snt.get("tokens")
+            if t.get("upos") in upos_list]
+
+
+def get_annot(snt):
+    return json.dumps([
+        {k: v for k, v in t.items() if k != 'dspan'}
+        for t in snt.get('tokens')])
+
+
 def trankit_to_float(sentences: List[str]):
     feats1, feats2, feats3 = trankit_to_int(sentences, skiphash=True)
     out1 = divide_by_1st_col(feats1)
@@ -218,6 +229,8 @@ def trankit_to_int(sentences: List[str], skiphash=True):
     feats3 = []
     hashes15 = []
     lemmata17 = []
+    spans = []
+    annotations = []
     for sent in sentences:
         try:
             snt = model_trankit(sent)
@@ -228,6 +241,8 @@ def trankit_to_int(sentences: List[str], skiphash=True):
             if not skiphash:
                 hsh15 = get_treesimi_hashes(snt)
                 lem17 = get_lemmata(snt)
+                span = get_span(snt)
+                annot = get_annot(snt)
         except Exception as e:  # RuntimeError, AssertionError
             num1, cnt1 = 0, np.zeros((len(TAGSET),), dtype=np.int8)
             num2, cnt2 = 0, np.zeros((len(MORPHTAGS),), dtype=np.int8)
@@ -235,6 +250,8 @@ def trankit_to_int(sentences: List[str], skiphash=True):
             if not skiphash:
                 hsh15 = [0 for _ in range(32)]
                 lem17 = []
+                span = []
+                annot = ""
             print(e)
         feats1.append((num1, *cnt1.tolist()))
         feats2.append((num2, *cnt2.tolist()))
@@ -242,6 +259,8 @@ def trankit_to_int(sentences: List[str], skiphash=True):
         if not skiphash:
             hashes15.append(hsh15)
             lemmata17.append(lem17)
+            spans.append(span)
+            annotations.append(annot)
     # 1
     feats1 = np.maximum(np.iinfo(np.int8).min, feats1)
     feats1 = np.minimum(np.iinfo(np.int8).max, feats1)
@@ -261,7 +280,7 @@ def trankit_to_int(sentences: List[str], skiphash=True):
     if skiphash:
         return feats1, feats2, feats3
     else:
-        return feats1, feats2, feats3, hashes15, lemmata17
+        return feats1, feats2, feats3, hashes15, lemmata17, spans, annotations
 
 
 def trankit_names():

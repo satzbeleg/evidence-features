@@ -10,6 +10,7 @@ import itertools
 from .transform_all import to_int, i2f
 from .transform_sbert import sbert_i2b
 from .transform_kshingle import kshingle_to_int32
+import uuid
 
 
 # start logger
@@ -124,10 +125,13 @@ def _cas_init_tables(session: cas.cluster.Session,
     session.execute(f"""
     CREATE TABLE IF NOT EXISTS {keyspace}.tbl_features (
       headword  TEXT
+    , example_id UUID
     , sentence  TEXT
+    , sent_id   UUID
     , spans    frozen<list<frozen<list<SMALLINT>>>>
     , annot    TEXT
     , biblio   TEXT
+    , license  TEXT
     , score    FLOAT
     , feats1   frozen<list<TINYINT>>
     , feats2   frozen<list<TINYINT>>
@@ -159,14 +163,16 @@ def handle_err(err, headword=None):
 def insert_sentences(session: cas.cluster.Session,
                      sentences: List[str],
                      max_chars: int = 2048,
-                     num_partitions: int = 128,
-                     scores: List[float] = None,
-                     biblio: List[str] = None):
+                     # num_partitions: int = 128,
+                     sent_ids: List[str] = None,
+                     biblio: List[str] = None,
+                     licensetext: List[str] = None,
+                     scores: List[float] = None):
     # encode features
     (
         f1, f2, f3, f4, f5, f6, f7, f8,
         f9, f12, f13, f14,
-        h15, h16, l17
+        h15, h16, l17, spans, annot
     ) = to_int(sentences)
     
     # encode bibliographic information if exists
@@ -189,12 +195,22 @@ def insert_sentences(session: cas.cluster.Session,
     # prepare statement
     stmt = session.prepare(f"""
     INSERT INTO {session.keyspace}.tbl_features
-    (headword, sentence, biblio, score,
-    feats1, feats2, feats3, feats4, 
-    feats5, feats6, feats7, feats8,
-    feats9, feats12, feats13, feats14, 
-    hashes15, hashes16, hashes18)
-    VALUES (?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,  ?, ?, ?)
+    (
+        headword, example_id, sentence, sent_id, 
+        spans, annot, biblio, license, score,
+        feats1, feats2, feats3, feats4, 
+        feats5, feats6, feats7, feats8,
+        feats9, feats12, feats13, feats14, 
+        hashes15, hashes16, hashes18
+    )
+    VALUES (
+        ?, ?, ?, ?,  
+        ?, ?, ?, ?, ?,  
+        ?, ?, ?, ?, 
+        ?, ?, ?, ?,  
+        ?, ?, ?, ?,  
+        ?, ?, ?
+    )
     IF NOT EXISTS;
     """)
 
@@ -217,11 +233,14 @@ def insert_sentences(session: cas.cluster.Session,
         if len(l17[i]) == 0:
             logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
             continue
+        # generate UUID on the fly
+        example_id = str(uuid.uuid4())
         # save a row for each headword
         for headword in l17[i]:
             # add to batch
             batches[headword].add(stmt, [
-                headword, text, biblio[i], scores[i],
+                headword, example_id, text, sent_ids[i], 
+                spans[i], annot[i], biblio[i], licensetext[i], scores[i],
                 f1[i], f2[i], f3[i], f4[i], 
                 f5[i], f6[i], f7[i], f8[i],
                 f9[i], f12[i], f13[i], f14[i], 
