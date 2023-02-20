@@ -6,12 +6,19 @@ Linguistic feature extraction for German (lang: de) as 8-bit interger representa
 
 ```sh
 # Ensure that python packages are availabe
-sudo apt install python3.9-dev python3-venv
+sudo apt install python3-venv
 
 # install virtualenv
 python3.9 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
+
+# the fasttext lib is unmaintained and the pypi.org package is broken
+sudo apt install python3.9-dev
+git clone https://github.com/facebookresearch/fastText.git
+cd fastText
+pip install --use-pep517 .
+cd ..
 
 # install other packages
 pip install --use-pep517 -e .
