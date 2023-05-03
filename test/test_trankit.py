@@ -6,12 +6,15 @@ def test1():
         "Dieser Satz ist ein Beispiel, aber eher kurz.",
         "Die Kuh macht muh, der Hund wufft aber lauter."
     ]
-    enc1, enc2, enc3, hsh4, lem5 = evf.trankit_to_int(
+    enc1, enc2, enc3, hsh4, lem5, span6, ann7 = evf.trankit_to_int(
         sentences, skiphash=False)
     assert enc1.shape == (2, 17)
     assert enc2.shape == (2, 48)
     assert enc3.shape == (2, 21)
     assert hsh4.shape == (2, 32)
+    assert len(lem5) == 2
+    assert len(span6) == 2
+    assert len(ann7) == 2
     enc1, enc2, enc3 = evf.trankit_to_int(sentences)
     assert enc1.shape == (2, 17)
     assert enc2.shape == (2, 48)
