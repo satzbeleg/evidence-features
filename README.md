@@ -9,16 +9,9 @@ Linguistic feature extraction for German (lang: de) as 8-bit interger representa
 sudo apt install python3-venv
 
 # install virtualenv
-python3.9 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-
-# the fasttext lib is unmaintained and the pypi.org package is broken
-sudo apt install python3.9-dev
-git clone https://github.com/facebookresearch/fastText.git
-cd fastText
-pip install --use-pep517 .
-cd ..
 
 # install other packages
 pip install --use-pep517 -e .
@@ -38,11 +31,6 @@ pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
 
 ### Install MiniConda for GPU
 In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not maintain PyPi packages).
-
-```sh
-# fasttext requires `python3.9-dev`
-sudo apt install python3.9-dev
-```
 
 ```sh
 conda install -y pip
@@ -98,6 +86,7 @@ If you have access to ZDL's DVC backend, run
 ```sh
 dvc pull -r zdl
 ```
+
 
 ### Features Overview
 Currently, 1024 binary and 157 floating-point features are extracted whcih can be stored as 293 int8 elements in a database.
