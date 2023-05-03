@@ -169,11 +169,12 @@ def insert_sentences(session: cas.cluster.Session,
                      licensetext: List[str] = None,
                      scores: List[float] = None):
     # encode features
+    # if sbert_making=True then `len(f1) = product(l17.shapes)`
     (
         f1, f2, f3, f4, f5, f6, f7, f8,
         f9, f12, f13, f14,
         h15, h16, l17, spans, annot
-    ) = to_int(sentences)
+    ) = to_int(sentences, sbert_masking=True)
 
     # encode bibliographic information if exists
     if biblio is not None:
@@ -222,6 +223,7 @@ def insert_sentences(session: cas.cluster.Session,
     }
 
     # loop over each sentence
+    j_mask = 0  # index for `f1[j_mask]`
     for i, text in enumerate(sentences):
         # chop sentence length to `max_chars`
         text = text[:max_chars]
@@ -241,11 +243,13 @@ def insert_sentences(session: cas.cluster.Session,
             batches[headword].add(stmt, [
                 headword, example_id, text, uuid.UUID(sent_ids[i]),
                 [spans[i][k]], annot[i], biblio[i], licensetext[i], scores[i],
-                f1[i], f2[i], f3[i], f4[i],
+                f1[j_mask],  # masked embeddings!
+                f2[i], f3[i], f4[i],
                 f5[i], f6[i], f7[i], f8[i],
                 f9[i], f12[i], f13[i], f14[i],
                 h15[i], h16[i], h18[i]
             ])
+            j_mask += 1  # masked embeddings!
 
     # execute
     for headword, batch in batches.items():

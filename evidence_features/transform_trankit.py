@@ -204,6 +204,17 @@ def get_lemmata(snt, upos_list=["NOUN", "VERB", "ADJ"]):
             if t.get("upos") in upos_list]
 
 
+def get_masks(snt, upos_list=["NOUN", "VERB", "ADJ"]):
+    masked = []
+    text = snt.get("text")
+    for t in snt.get("tokens"):
+        if t.get("upos") in upos_list:
+            span = t.get("span")
+            masked.append(
+                f"{text[0:span[0]]}[MASK]{text[span[1]:]}")
+    return masked
+
+
 def get_span(snt, upos_list=["NOUN", "VERB", "ADJ"]):
     return [t.get("span") for t in snt.get("tokens")
             if t.get("upos") in upos_list]
@@ -216,21 +227,27 @@ def get_annot(snt):
 
 
 def trankit_to_float(sentences: List[str]):
-    feats1, feats2, feats3 = trankit_to_int(sentences, skiphash=True)
+    (
+        feats1, feats2, feats3, _,
+        _, _, _, _
+    ) = trankit_to_int(sentences)
     out1 = divide_by_1st_col(feats1)
     out2 = divide_by_1st_col(feats2)
     out3 = divide_by_sum(feats3)
     return out1, out2, out3
 
 
-def trankit_to_int(sentences: List[str], skiphash=True):
+def trankit_to_int(sentences: List[str],
+                   upos_list=["NOUN", "VERB", "ADJ"]):
     feats1 = []
     feats2 = []
     feats3 = []
     hashes15 = []
     lemmata17 = []
+    masked = []
     spans = []
     annotations = []
+
     for sent in sentences:
         try:
             snt = model_trankit(sent)
@@ -238,29 +255,33 @@ def trankit_to_int(sentences: List[str], skiphash=True):
             num1, cnt1 = get_postag_counts(snt)
             num2, cnt2 = get_morphtag_counts(snt)
             cnt3 = get_nodedist(snt)
-            if not skiphash:
-                hsh15 = get_treesimi_hashes(snt)
-                lem17 = get_lemmata(snt)
-                span = get_span(snt)
-                annot = get_annot(snt)
+            # hashes and other meta info
+            hsh15 = get_treesimi_hashes(snt)
+            lem17 = get_lemmata(snt, upos_list=upos_list)
+            masks = get_masks(snt, upos_list=upos_list)
+            span = get_span(snt, upos_list=upos_list)
+            annot = get_annot(snt)
         except Exception as e:  # RuntimeError, AssertionError
             num1, cnt1 = 0, np.zeros((len(TAGSET),), dtype=np.int8)
             num2, cnt2 = 0, np.zeros((len(MORPHTAGS),), dtype=np.int8)
             cnt3 = np.array([0 for _ in range(21)])
-            if not skiphash:
-                hsh15 = [0 for _ in range(32)]
-                lem17 = []
-                span = []
-                annot = ""
+            # hashes and other meta info
+            hsh15 = [0 for _ in range(32)]
+            lem17 = []
+            masks = []
+            span = []
+            annot = ""
             print(e)
+
         feats1.append((num1, *cnt1.tolist()))
         feats2.append((num2, *cnt2.tolist()))
         feats3.append(cnt3.tolist())
-        if not skiphash:
-            hashes15.append(hsh15)
-            lemmata17.append(lem17)
-            spans.append(span)
-            annotations.append(annot)
+        # hashes and other meta info
+        hashes15.append(hsh15)
+        lemmata17.append(lem17)
+        masked.append(masks)
+        spans.append(span)
+        annotations.append(annot)
     # 1
     feats1 = np.maximum(np.iinfo(np.int8).min, feats1)
     feats1 = np.minimum(np.iinfo(np.int8).max, feats1)
@@ -274,13 +295,12 @@ def trankit_to_int(sentences: List[str], skiphash=True):
     feats3 = np.minimum(np.iinfo(np.int8).max, feats3)
     feats3 = np.vstack(feats3).astype(np.int8)
     # 15
-    if not skiphash:
-        hashes15 = np.vstack(hashes15).astype(np.int32)
+    hashes15 = np.vstack(hashes15).astype(np.int32)
     # done
-    if skiphash:
-        return feats1, feats2, feats3
-    else:
-        return feats1, feats2, feats3, hashes15, lemmata17, spans, annotations
+    return (
+        feats1, feats2, feats3, hashes15,
+        lemmata17, masked, spans, annotations
+    )
 
 
 def trankit_names():
