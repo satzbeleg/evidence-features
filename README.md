@@ -78,6 +78,8 @@ bash download-models.sh
 
 # run tests
 pytest
+# check time measurement
+python test/check_timer.py
 ```
 
 ### Download via DVC Backend

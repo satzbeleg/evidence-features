@@ -46,7 +46,7 @@ setuptools.setup(
         "nltk>=3.7,<4",
         "pandas>=1.3.5,<2",
         "fasttext-wheel",
-        #"fasttext>=0.9.2,<1",
+        # "fasttext>=0.9.2,<1",
         "treesimi>=0.2.0,<1",
         "datasketch>=1.5.8,<2",
         "mmh3>=3.0.0,<4",

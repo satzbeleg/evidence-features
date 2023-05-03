@@ -174,7 +174,7 @@ def insert_sentences(session: cas.cluster.Session,
         f9, f12, f13, f14,
         h15, h16, l17, spans, annot
     ) = to_int(sentences)
-    
+
     # encode bibliographic information if exists
     if biblio is not None:
         h18 = kshingle_to_int32(biblio)
@@ -196,19 +196,19 @@ def insert_sentences(session: cas.cluster.Session,
     stmt = session.prepare(f"""
     INSERT INTO {session.keyspace}.tbl_features
     (
-        headword, example_id, sentence, sent_id, 
+        headword, example_id, sentence, sent_id,
         spans, annot, biblio, license, score,
-        feats1, feats2, feats3, feats4, 
+        feats1, feats2, feats3, feats4,
         feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14, 
+        feats9, feats12, feats13, feats14,
         hashes15, hashes16, hashes18
     )
     VALUES (
-        ?, ?, ?, ?,  
-        ?, ?, ?, ?, ?,  
-        ?, ?, ?, ?, 
-        ?, ?, ?, ?,  
-        ?, ?, ?, ?,  
+        ?, ?, ?, ?,
+        ?, ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, ?, ?, ?,
         ?, ?, ?
     )
     IF NOT EXISTS;
@@ -239,11 +239,11 @@ def insert_sentences(session: cas.cluster.Session,
         for k, headword in enumerate(l17[i]):
             # add to batch
             batches[headword].add(stmt, [
-                headword, example_id, text, uuid.UUID(sent_ids[i]), 
+                headword, example_id, text, uuid.UUID(sent_ids[i]),
                 [spans[i][k]], annot[i], biblio[i], licensetext[i], scores[i],
-                f1[i], f2[i], f3[i], f4[i], 
+                f1[i], f2[i], f3[i], f4[i],
                 f5[i], f6[i], f7[i], f8[i],
-                f9[i], f12[i], f13[i], f14[i], 
+                f9[i], f12[i], f13[i], f14[i],
                 h15[i], h16[i], h18[i]
             ])
 

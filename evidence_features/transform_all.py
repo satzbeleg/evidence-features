@@ -59,6 +59,13 @@ from .utils import (
 import numpy as np
 from typing import List
 
+from timeit import default_timer as timer
+import logging
+
+# start logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 def to_float(sentences: List[str]):
     feats1 = sbert_to_bool(sentences).astype(np.float32)
@@ -78,22 +85,73 @@ def to_float(sentences: List[str]):
     ])
 
 
-def to_int(sentences: List[str]):
-    feats1 = sbert_to_int8(sentences)
-    (
-        feats2, feats3, feats4, hashes15,
-        lemmata17, spans, annotations
-    ) = trankit_to_int(
-        sentences, skiphash=False)
-    feats5 = consonant_to_int16(sentences)
-    feats6 = derechar_to_int16(sentences)
-    feats7 = derebigram_to_int16(sentences)
-    feats8 = cow_to_int8(sentences)
-    feats9 = smor_to_int8(sentences)
-    feats12 = seqlen_to_int16(sentences)
-    feats13 = fasttext176_to_int8(sentences)
-    feats14 = emoji_to_int8(sentences)
-    hashes16 = kshingle_to_int32(sentences)
+def to_int(sentences: List[str], measure_time=False):
+    if measure_time:
+        start = timer()
+        feats1 = sbert_to_int8(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (1) SBert")
+
+        start = timer()
+        (
+            feats2, feats3, feats4, hashes15,
+            lemmata17, spans, annotations
+        ) = trankit_to_int(
+            sentences, skiphash=False)
+        logger.info(
+            f" {timer() - start: .6f} sec. elapsed (2/3/4/15/17/s/a) Trankit")
+
+        start = timer()
+        feats5 = consonant_to_int16(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (5) Consonant")
+
+        start = timer()
+        feats6 = derechar_to_int16(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (6) DeReChar")
+
+        start = timer()
+        feats7 = derebigram_to_int16(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (7) DeReBigram")
+
+        start = timer()
+        feats8 = cow_to_int8(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (8) COW")
+
+        start = timer()
+        feats9 = smor_to_int8(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (9) SMOR")
+
+        start = timer()
+        feats12 = seqlen_to_int16(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (12) Seqlen")
+
+        start = timer()
+        feats13 = fasttext176_to_int8(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (13) FastText")
+
+        start = timer()
+        feats14 = emoji_to_int8(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (14) Emoji")
+
+        start = timer()
+        hashes16 = kshingle_to_int32(sentences)
+        logger.info(f" {timer() - start: .6f} sec. elapsed (16) Fingerprint")
+    else:
+        feats1 = sbert_to_int8(sentences)
+        (
+            feats2, feats3, feats4, hashes15,
+            lemmata17, spans, annotations
+        ) = trankit_to_int(
+            sentences, skiphash=False)
+        feats5 = consonant_to_int16(sentences)
+        feats6 = derechar_to_int16(sentences)
+        feats7 = derebigram_to_int16(sentences)
+        feats8 = cow_to_int8(sentences)
+        feats9 = smor_to_int8(sentences)
+        feats12 = seqlen_to_int16(sentences)
+        feats13 = fasttext176_to_int8(sentences)
+        feats14 = emoji_to_int8(sentences)
+        hashes16 = kshingle_to_int32(sentences)
+    # done
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
         feats9, feats12, feats13, feats14,
