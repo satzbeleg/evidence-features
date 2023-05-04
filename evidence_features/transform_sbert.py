@@ -13,7 +13,7 @@ MODELPATH = os.path.join(MODELPATH, "sbert")
 
 # CUDA settings
 if torch.cuda.is_available():
-    GPUID = os.getenv("BERT_GPUID", 0)
+    GPUID = int(os.getenv("BERT_GPUID", 0))
     device = torch.device(f"cuda:{GPUID}")
 else:
     device = torch.device('cpu')
