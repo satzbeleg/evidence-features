@@ -35,6 +35,7 @@ def sbert_to_bool(sentences: List[str]):
 def sbert_to_int8(sentences: List[str]):
     # run SBert
     feats = model_sbert.encode(sentences)
+    torch.cuda.empty_cache()
     # project to boolean
     hashed = model_hrp(feats)
     # encode to int8
