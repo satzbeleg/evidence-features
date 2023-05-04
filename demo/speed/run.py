@@ -5,22 +5,22 @@ import evidence_features as evf
 import glob
 
 # path to the pretrained trankit model
-import trankit
-import os
-import torch
+# import trankit
+# import os
+# import torch
 
-MODELPATH = os.getenv("MODELFOLDER", "./models")
-MODELPATH = os.path.join(MODELPATH, "trankit")
+# MODELPATH = os.getenv("MODELFOLDER", "./models")
+# MODELPATH = os.path.join(MODELPATH, "trankit")
 
-# Load the pretrained model
-model_trankit = trankit.Pipeline(
-    lang='german-hdt',
-    gpu=torch.cuda.is_available(),
-    cache_dir=MODELPATH
-)
+# # Load the pretrained model
+# model_trankit = trankit.Pipeline(
+#     lang='german-hdt',
+#     gpu=torch.cuda.is_available(),
+#     cache_dir=MODELPATH
+# )
 
 # Timer
-from timeit import default_timer as timer
+# from timeit import default_timer as timer
 import logging
 
 # start logger
@@ -53,6 +53,6 @@ with open(FILE, 'r') as fp:
     ) = evf.to_int(sentences, measure_time=True, sbert_masking=True, document_level=True)
 
     # check how much tim just trankit needs
-    start = timer()
-    snt = model_trankit("\n".join(sentences))
-    logger.info(f"{timer() - start: .6f} sec. elapsed, Trankit Only")
+    # start = timer()
+    # snt = model_trankit("\n".join(sentences))
+    # logger.info(f"{timer() - start: .6f} sec. elapsed, Trankit Only")
