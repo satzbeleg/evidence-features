@@ -10,6 +10,7 @@ import tensorflow as tf
 MODELPATH = os.getenv("MODELFOLDER", "./models")
 MODELPATH = os.path.join(MODELPATH, "sbert")
 
+
 # CUDA settings
 if torch.cuda.is_available():
     GPUID = os.getenv("BERT_GPUID", 0)
@@ -17,23 +18,30 @@ if torch.cuda.is_available():
 else:
     device = torch.device('cpu')
 
-# HRP runs on Tensorflow, so we need to limit the GPU memory usage
+
+# Balance GPU Memory for Tensorflow vs PyTorch on GPUID
 if torch.cuda.is_available():
+    # Limit TensorFlow to using only the desired GPUID
     gpus = tf.config.list_physical_devices('GPU')
-    # limit to using only the desired GPU ID
     tf.config.set_visible_devices(gpus[GPUID], device_type='GPU')
-    # limit memory usage to 20% of GPU memory or max 4Gb
+
+    # Limit TensorFlow to 49% of GPU memory or max 8Gb
     avail_gb = torch.cuda.mem_get_info()[GPUID] // 1024**2
     log_dev_conf = tf.config.LogicalDeviceConfiguration(
-        memory_limit=min(4 * 1024, avail_gb * 0.2)
+        memory_limit=min(8 * 1024, avail_gb * 0.49)
     )
     tf.config.set_logical_device_configuration(
         gpus[GPUID], [log_dev_conf])
+
+    # Limit PyTorch to 49% of GPU memory on GPUID
+    torch.cuda.set_per_process_memory_fraction(0.49, GPUID)
+
 
 # Load the pretrained model
 model_sbert = sbert.SentenceTransformer(
     'paraphrase-multilingual-MiniLM-L12-v2',
     cache_folder=MODELPATH, device=device)
+
 
 # HRP layer
 model_hrp = khrp.HashedRandomProjection(
