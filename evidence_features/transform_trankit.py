@@ -3,6 +3,7 @@ import torch
 import trankit
 import node_distance as nd
 from typing import List
+import string
 import numpy as np
 from .utils import divide_by_1st_col, divide_by_sum
 # syntax hashes for similarity metrics
@@ -226,37 +227,63 @@ def get_annot(snt):
         for t in snt.get('tokens')])
 
 
-def trankit_to_float(sentences: List[str]):
+def trankit_to_float(sentences: List[str], document_level=False):
     (
         feats1, feats2, feats3, _,
-        _, _, _, _
-    ) = trankit_to_int(sentences)
+        _, _, _, _, _
+    ) = trankit_to_int(sentences, document_level=document_level)
     out1 = divide_by_1st_col(feats1)
     out2 = divide_by_1st_col(feats2)
     out3 = divide_by_sum(feats3)
     return out1, out2, out3
 
 
+def check_sentences_to_document(document: str):
+    if isinstance(document, (list, tuple)):
+        tmp = [s.strip() for s in document]
+        tmp = [s for s in tmp if len(s) > 1]
+        tmp = [s if s[-1] in string.punctuation else f"{s}." for s in tmp]
+        tmp = "\n".join(tmp)
+        return tmp
+    else:
+        return document
+
+
 def trankit_to_int(sentences: List[str],
-                   upos_list=["NOUN", "VERB", "ADJ"]):
+                   upos_list=["NOUN", "VERB", "ADJ"],
+                   document_level=False):
+    # annotation with trankit
+    if document_level:
+        # document-level processing ist 5x faster
+        document = check_sentences_to_document(sentences)
+        parsed_sents = model_trankit(document).get('sentences')
+    else:
+    # sentence-level processing
+        parsed_sents = [
+            model_trankit(s).get('sentences')[0]
+            for s in sentences]
+    torch.cuda.empty_cache()
+
+    # init lists
     feats1 = []
     feats2 = []
     feats3 = []
     hashes15 = []
+    sentences_sbd = []
     lemmata17 = []
     masked = []
     spans = []
     annotations = []
 
-    for sent in sentences:
+    # loop over parsed sentences
+    for snt in parsed_sents:
         try:
-            snt = model_trankit(sent)
-            snt = snt.get('sentences')[0]
             num1, cnt1 = get_postag_counts(snt)
             num2, cnt2 = get_morphtag_counts(snt)
             cnt3 = get_nodedist(snt)
             # hashes and other meta info
             hsh15 = get_treesimi_hashes(snt)
+            senttxt = snt.get("text")
             lem17 = get_lemmata(snt, upos_list=upos_list)
             masks = get_masks(snt, upos_list=upos_list)
             span = get_span(snt, upos_list=upos_list)
@@ -267,6 +294,7 @@ def trankit_to_int(sentences: List[str],
             cnt3 = np.array([0 for _ in range(21)])
             # hashes and other meta info
             hsh15 = [0 for _ in range(32)]
+            senttxt = ""
             lem17 = []
             masks = []
             span = []
@@ -278,10 +306,12 @@ def trankit_to_int(sentences: List[str],
         feats3.append(cnt3.tolist())
         # hashes and other meta info
         hashes15.append(hsh15)
+        sentences_sbd.append(senttxt)
         lemmata17.append(lem17)
         masked.append(masks)
         spans.append(span)
         annotations.append(annot)
+
     # 1
     feats1 = np.maximum(np.iinfo(np.int8).min, feats1)
     feats1 = np.minimum(np.iinfo(np.int8).max, feats1)
@@ -296,10 +326,11 @@ def trankit_to_int(sentences: List[str],
     feats3 = np.vstack(feats3).astype(np.int8)
     # 15
     hashes15 = np.vstack(hashes15).astype(np.int32)
+
     # done
     return (
         feats1, feats2, feats3, hashes15,
-        lemmata17, masked, spans, annotations
+        sentences_sbd, lemmata17, masked, spans, annotations
     )
 
 

@@ -67,7 +67,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def to_float(sentences: List[str], masked: List[str] = None):
+def to_float(sentences: List[str], 
+             masked: List[str] = None):
     if masked is None:
         feats1 = sbert_to_bool(sentences).astype(np.float32)
     else:
@@ -90,13 +91,33 @@ def to_float(sentences: List[str], masked: List[str] = None):
 
 def to_int(sentences: List[str],
            measure_time=False,
-           sbert_masking=False):
+           sbert_masking=False,
+           document_level=False):
+    """ Transform a list of sentences to a numpy array of integers.
+
+    Args:
+        sentences: 
+            list of sentences
+        
+        measure_time: 
+            measure time for each transformation
+        
+        sbert_masking: 
+            use masked sentences for SBert
+        
+        document_level: 
+            use document-level Trankit.
+            The number of sentences might change if document_level=True.
+              Then use the output `sentences_sbd` afterwards
+    """
     if measure_time:
         start = timer()
         (
             feats2, feats3, feats4, hashes15,
-            lemmata17, masked, spans, annotations
-        ) = trankit_to_int(sentences)
+            sentences_sbd, lemmata17, masked, spans, annotations
+        ) = trankit_to_int(sentences, document_level=document_level)
+        if document_level:
+            sentences = sentences_sbd
         logger.info(
             f"{timer() - start: .6f} sec. elapsed (2/3/4/15/17/m/s/a) Trankit")
 
@@ -144,10 +165,13 @@ def to_int(sentences: List[str],
         hashes16 = kshingle_to_int32(sentences)
         logger.info(f"{timer() - start: .6f} sec. elapsed (16) Fingerprint")
     else:
+        # Trankit
         (
             feats2, feats3, feats4, hashes15,
-            lemmata17, masked, spans, annotations
-        ) = trankit_to_int(sentences)
+            sentences_sbd, lemmata17, masked, spans, annotations
+        ) = trankit_to_int(sentences, document_level=document_level)
+        if document_level:
+            sentences = sentences_sbd
         # for sbert N masked sentences or 1 original sentence
         if sbert_masking:
             feats1 = sbert_to_int8(
@@ -170,7 +194,7 @@ def to_int(sentences: List[str],
     return (
         feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
         feats9, feats12, feats13, feats14, hashes15, hashes16,
-        lemmata17, spans, annotations
+        sentences_sbd, lemmata17, spans, annotations
     )
 
 
