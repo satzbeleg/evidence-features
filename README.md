@@ -129,9 +129,16 @@ In case of SBert wer compress the floating-point feature with hashed random proj
 ### Correlation among features
 
 ```sh
+# source .venv/bin/activate
+# or start conda, and set path to conda's CUDA
 conda activate gpu-venv-evidence-features 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-# source .venv/bin/activate
+
+# limit how much GPU RAM (in Mb) Pytorch can reserve (e.g. trankit, sbert)
+#export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,garbage_collection_threshold:0.7
+
+# assign Sbert and Tensorflow to other GPU device
+# export BERT_GPUID=1
 
 export MODELFOLDER="$(pwd)/models"
 cd demo/corr
@@ -144,9 +151,13 @@ jupyter lab
 [Sentence embedding evaluation for German](https://github.com/ulf1/sentence-embedding-evaluation-german)
 
 ```sh
+# source .venv/bin/activate
+# or start conda, and set path to conda's CUDA
 conda activate gpu-venv-evidence-features 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-#source .venv/bin/activate
+
+# limit how much GPU RAM (in Mb) Pytorch can reserve (e.g. trankit, sbert)
+#export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,garbage_collection_threshold:0.7
 
 export MODELFOLDER="$(pwd)/models"
 cd demo/benchmark

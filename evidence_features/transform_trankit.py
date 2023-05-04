@@ -263,7 +263,7 @@ def trankit_to_int(sentences: List[str],
             model_trankit(s).get('sentences')[0]
             for s in sentences]
     torch.cuda.empty_cache()
-    
+
     # init lists
     feats1 = []
     feats2 = []
