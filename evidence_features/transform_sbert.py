@@ -21,15 +21,15 @@ model_sbert = sbert.SentenceTransformer(
 # HRP runs on Tensorflow, so we need to limit the GPU memory usage
 if torch.cuda.is_available():
     gpus = tf.config.list_physical_devices('GPU')
-    # limit to using only the last GPU
-    tf.config.set_visible_devices(gpus[-1], device_type='GPU')
+    # limit to using only the 1st GPU
+    tf.config.set_visible_devices(gpus[0], device_type='GPU')
     # limit memory usage to 20% of GPU memory or max 4Gb
-    avail_gb = torch.cuda.mem_get_info()[-1] // 1024**2
+    avail_gb = torch.cuda.mem_get_info()[0] // 1024**2
     log_dev_conf = tf.config.LogicalDeviceConfiguration(
         memory_limit=min(4 * 1024, avail_gb * 0.2)
     )
     tf.config.set_logical_device_configuration(
-        gpus[-1], [log_dev_conf])
+        gpus[0], [log_dev_conf])
 
 # HRP layer
 model_hrp = khrp.HashedRandomProjection(
