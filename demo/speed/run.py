@@ -39,11 +39,11 @@ with open(FILE, 'r') as fp:
     logger.info(f"Batch Size: {len(sentences)}")
 
     # sentence-level processing with trankit
-    (
-        feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14, hashes15, hashes16,
-        sentences_parsed, lemmata17, spans, annotations
-    ) = evf.to_int(sentences, measure_time=True, sbert_masking=True, document_level=False)
+    # (
+    #     feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
+    #     feats9, feats12, feats13, feats14, hashes15, hashes16,
+    #     sentences_parsed, lemmata17, spans, annotations
+    # ) = evf.to_int(sentences, measure_time=True, sbert_masking=True, document_level=False)
 
     # document-level processing with trankit
     (
