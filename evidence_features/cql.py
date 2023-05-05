@@ -197,6 +197,7 @@ def insert_sentences(session: cas.cluster.Session,
             h18 = np.array(
                 kshingle_to_int32([biblio])[0].tolist() * len(sentences)
             ).astype(np.int32)
+            biblio = [biblio] * len(sentences)
     else:
         h18 = np.array([[0] * 32] * len(sentences)).astype(np.int32)
         biblio = [""] * len(sentences)
