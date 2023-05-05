@@ -3,7 +3,7 @@ import evidence_features as evf
 
 def test1():
     sentences = [
-        "Dieser Satz ist ein Beispiel, aber eher kurz. Und ein extra Satzbeleg",
+        "Dieser Satz ist ein Beispiel, aber eher kurz. Und ein extra Satz",
         "Die Kuh macht muh, der Hund wufft aber lauter."
     ]
 
@@ -30,7 +30,7 @@ def test1():
 
 def test2():
     sentences = [
-        "Dieser Satz ist ein Beispiel, aber eher kurz. Und ein extra Satzbeleg",
+        "Dieser Satz ist ein Beispiel, aber eher kurz. Und ein extra Satz",
         "Die Kuh macht muh, der Hund wufft aber lauter."
     ]
 

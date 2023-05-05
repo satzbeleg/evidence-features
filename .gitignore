@@ -115,3 +115,6 @@ models/*
 demo/data/*.txt
 demo/*.tar.gz
 fastText
+
+
+test-check*.jsonl
