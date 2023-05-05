@@ -11,6 +11,7 @@ from .transform_all import to_int, i2f
 from .transform_sbert import sbert_i2b
 from .transform_kshingle import kshingle_to_int32
 import uuid
+from .todisk import is_valid_uuid
 
 
 # start logger
@@ -173,22 +174,35 @@ def insert_sentences(session: cas.cluster.Session,
     # if sbert_making=True then `len(f1) = product(l17.shapes)`
     (
         f1, f2, f3, f4, f5, f6, f7, f8,
-        f9, f12, f13, f14, h15, h16, 
+        f9, f12, f13, f14, h15, h16,
         sentences_sbd, l17, spans, annot
     ) = to_int(sentences, sbert_masking=True, document_level=document_level)
     if document_level:
         sentences = sentences_sbd
 
+    # sent ids
+    if sent_ids is None:
+        sent_ids = [str(uuid.uuid4()) for _ in range(len(sentences))]
+    else:
+        # if sent_ids are not UUID strings, then hash strings as UUID
+        sent_ids = [
+            x if is_valid_uuid(x) else str(uuid.UUID(x))
+            for x in sent_ids]
+
     # encode bibliographic information if exists
     if biblio is not None:
         h18 = kshingle_to_int32(biblio)
     else:
-        h18 = [[0] * 32] * len(sentences)
+        h18 = np.array([[0] * 32] * len(sentences)).astype(np.int32)
         biblio = [""] * len(sentences)
+
+    # check license
+    if licensetext is None:
+        licensetext = [""] * len(sentences)
 
     # check scores
     if scores is None:
-        scores = [np.nan] * len(sentences)
+        scores = [0.5] * len(sentences)
 
     # get headwords
     headwords = list(set(itertools.chain(*l17)))
@@ -233,18 +247,19 @@ def insert_sentences(session: cas.cluster.Session,
         # skip all sentences with less than 3 tokens
         if len(text.split(" ")) < 3:
             logger.warning(f"Sentence to short: '{text}'")
+            j_mask += len(l17[i])
             continue
         # skip if no headword was found
         if len(l17[i]) == 0:
             logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
+            j_mask += len(l17[i])
             continue
-        # generate UUID on the fly
-        example_id = uuid.uuid4()
+
         # save a row for each headword
         for k, headword in enumerate(l17[i]):
             # add to batch
             batches[headword].add(stmt, [
-                headword, example_id, text, uuid.UUID(sent_ids[i]),
+                headword, uuid.uuid4(), text, uuid.UUID(sent_ids[i]),
                 [spans[i][k]], annot[i], biblio[i], licensetext[i], scores[i],
                 f1[j_mask],  # masked embeddings!
                 f2[i], f3[i], f4[i],
