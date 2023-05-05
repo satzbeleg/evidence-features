@@ -167,14 +167,17 @@ def insert_sentences(session: cas.cluster.Session,
                      sent_ids: List[str] = None,
                      biblio: List[str] = None,
                      licensetext: List[str] = None,
-                     scores: List[float] = None):
+                     scores: List[float] = None,
+                     document_level=False):
     # encode features
     # if sbert_making=True then `len(f1) = product(l17.shapes)`
     (
         f1, f2, f3, f4, f5, f6, f7, f8,
-        f9, f12, f13, f14,
-        h15, h16, l17, spans, annot
-    ) = to_int(sentences, sbert_masking=True)
+        f9, f12, f13, f14, h15, h16, 
+        sentences_sbd, l17, spans, annot
+    ) = to_int(sentences, sbert_masking=True, document_level=document_level)
+    if document_level:
+        sentences = sentences_sbd
 
     # encode bibliographic information if exists
     if biblio is not None:
