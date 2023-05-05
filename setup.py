@@ -50,7 +50,8 @@ setuptools.setup(
         "treesimi>=0.2.0,<1",
         "datasketch>=1.5.8,<2",
         "mmh3>=3.0.0,<4",
-        "kshingle>=0.10.0,<1"
+        "kshingle>=0.10.0,<1",
+        "jsonlines>=3,<4"
     ],
     # scripts=['scripts/examplescript.py'],
     python_requires='>=3.7',
