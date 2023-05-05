@@ -258,7 +258,7 @@ def trankit_to_int(sentences: List[str],
         document = check_sentences_to_document(sentences)
         parsed_sents = model_trankit(document).get('sentences')
     else:
-    # sentence-level processing
+        # sentence-level processing
         parsed_sents = [
             model_trankit(s).get('sentences')[0]
             for s in sentences]
