@@ -67,7 +67,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def to_float(sentences: List[str], 
+def to_float(sentences: List[str],
              masked: List[str] = None):
     if masked is None:
         feats1 = sbert_to_bool(sentences).astype(np.float32)
@@ -96,16 +96,16 @@ def to_int(sentences: List[str],
     """ Transform a list of sentences to a numpy array of integers.
 
     Args:
-        sentences: 
+        sentences:
             list of sentences
-        
-        measure_time: 
+
+        measure_time:
             measure time for each transformation
-        
-        sbert_masking: 
+
+        sbert_masking:
             use masked sentences for SBert
-        
-        document_level: 
+
+        document_level:
             use document-level Trankit.
             The number of sentences might change if document_level=True.
               Then use the output `sentences_sbd` afterwards
@@ -178,8 +178,7 @@ def to_int(sentences: List[str],
                 [elem for sublist in masked for elem in sublist])
         else:
             feats1 = sbert_to_int8(sentences)
-        # other feautes
-        feats1 = sbert_to_int8(sentences)
+        # other features
         feats5 = consonant_to_int16(sentences)
         feats6 = derechar_to_int16(sentences)
         feats7 = derebigram_to_int16(sentences)
