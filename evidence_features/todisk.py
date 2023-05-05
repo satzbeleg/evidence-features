@@ -52,13 +52,20 @@ def encode_and_save(FILEPATH: str,
 
     # encode bibliographic information if exists
     if biblio is not None:
-        h18 = kshingle_to_int32(biblio)
+        if isinstance(biblio, (list, tuple)):
+            h18 = kshingle_to_int32(biblio)
+        elif isinstance(biblio, str):
+            h18 = np.array(
+                kshingle_to_int32([biblio])[0].tolist() * len(sentences)
+            ).astype(np.int32)
     else:
         h18 = np.array([[0] * 32] * len(sentences)).astype(np.int32)
         biblio = [""] * len(sentences)
 
     # check license
-    if licensetext is None:
+    if isinstance(licensetext, str):
+        licensetext = [licensetext] * len(sentences)
+    elif licensetext is None:
         licensetext = [""] * len(sentences)
 
     # check scores
