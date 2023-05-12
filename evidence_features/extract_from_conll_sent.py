@@ -269,10 +269,10 @@ def extract_from_sentence(sent: conllu.TokenList) -> dict:
 
     return (
         {
-            "sentence": reconstructed,  # f5, f6, f7, f13, f14, h16
-            "lemmata": lemmata,
-            "spans": spans,
-            "annot": annot,
+            "sentence": reconstructed,  # -> f5, f6, f7, f13, f14, h16
+            "lemmata": lemmata,  # headword/17
+            "spans": spans,  # spans
+            "annot": annot,  # annot
             "feats2": feats2,
             "feats3": feats3,
             "feats12": feats12,
