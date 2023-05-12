@@ -7,15 +7,19 @@ import gc
 import numpy as np
 from typing import List
 import itertools
-from .transform_all import to_int, i2f
-from .transform_sbert import sbert_i2b
-from .transform_kshingle import kshingle_to_int32
 import uuid
-from .todisk import is_valid_uuid
 
 
 # start logger
 logger = logging.getLogger(__name__)
+
+
+def is_valid_uuid(val):
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
 
 
 cas_exec_profile = cas.cluster.ExecutionProfile(
@@ -162,248 +166,215 @@ def handle_err(err, headword=None):
 
 
 def insert_sentences(session: cas.cluster.Session,
-                     sentences: List[str],
-                     max_chars: int = 2048,
-                     # num_partitions: int = 128,
-                     sent_ids: List[str] = None,
-                     biblio: List[str] = None,
-                     licensetext: List[str] = None,
-                     scores: List[float] = None,
-                     document_level=False):
-    # encode features
-    # if sbert_making=True then `len(f1) = product(l17.shapes)`
-    (
-        f1, f2, f3, f4, f5, f6, f7, f8,
-        f9, f12, f13, f14, h15, h16,
-        sentences_sbd, l17, spans, annot
-    ) = to_int(sentences, sbert_masking=True, document_level=document_level)
-    if document_level:
-        sentences = sentences_sbd
+                     filepath: str):
+    raise Exception("Not implemented yet")
 
-    # sent ids
-    if sent_ids is None:
-        sent_ids = [str(uuid.uuid4()) for _ in range(len(sentences))]
-    else:
-        # if sent_ids are not UUID strings, then hash strings as UUID
-        sent_ids = [
-            x if is_valid_uuid(x) else str(uuid.UUID(x))
-            for x in sent_ids]
+    # # prepare statement
+    # stmt = session.prepare(f"""
+    # INSERT INTO {session.keyspace}.tbl_features
+    # (
+    #     headword, example_id, sentence, sent_id,
+    #     spans, annot, biblio, license, score,
+    #     feats1, feats2, feats3, feats4,
+    #     feats5, feats6, feats7, feats8,
+    #     feats9, feats12, feats13, feats14,
+    #     hashes15, hashes16, hashes18
+    # )
+    # VALUES (
+    #     ?, ?, ?, ?,
+    #     ?, ?, ?, ?, ?,
+    #     ?, ?, ?, ?,
+    #     ?, ?, ?, ?,
+    #     ?, ?, ?, ?,
+    #     ?, ?, ?
+    # )
+    # IF NOT EXISTS;
+    # """)
 
-    # encode bibliographic information if exists
-    if biblio is not None:
-        if isinstance(biblio, (list, tuple)):
-            h18 = kshingle_to_int32(biblio)
-        elif isinstance(biblio, str):
-            h18 = np.array(
-                kshingle_to_int32([biblio])[0].tolist() * len(sentences)
-            ).astype(np.int32)
-            biblio = [biblio] * len(sentences)
-    else:
-        h18 = np.array([[0] * 32] * len(sentences)).astype(np.int32)
-        biblio = [""] * len(sentences)
+    # # prepare batch statement
+    # batches = {
+    #     k: cas.query.BatchStatement(
+    #         consistency_level=cas.query.ConsistencyLevel.ANY)
+    #     for k in headwords
+    # }
 
-    # check license
-    if isinstance(licensetext, str):
-        licensetext = [licensetext] * len(sentences)
-    elif licensetext is None:
-        licensetext = [""] * len(sentences)
+    # # loop over each sentence
+    # j_mask = 0  # index for `f1[j_mask]`
+    # for i, text in enumerate(sentences):
+    #     # chop sentence length to `max_chars`
+    #     text = text[:max_chars]
+    #     # skip all sentences with less than 3 tokens
+    #     if len(text.split(" ")) < 3:
+    #         logger.warning(f"Sentence to short: '{text}'")
+    #         j_mask += len(l17[i])
+    #         continue
+    #     # skip if no headword was found
+    #     if len(l17[i]) == 0:
+    #         logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
+    #         j_mask += len(l17[i])
+    #         continue
 
-    # check scores
-    if scores is None:
-        scores = [0.5] * len(sentences)
+    #     # save a row for each headword
+    #     for k, headword in enumerate(l17[i]):
+    #         # add to batch
+    #         batches[headword].add(stmt, [
+    #             headword, uuid.uuid4(), text, uuid.UUID(sent_ids[i]),
+    #             [spans[i][k]], annot[i], biblio[i], licensetext[i], scores[i],
+    #             f1[j_mask],  # masked embeddings!
+    #             f2[i], f3[i], f4[i],
+    #             f5[i], f6[i], f7[i], f8[i],
+    #             f9[i], f12[i], f13[i], f14[i],
+    #             h15[i], h16[i], h18[i]
+    #         ])
+    #         j_mask += 1  # masked embeddings!
 
-    # get headwords
-    headwords = list(set(itertools.chain(*l17)))
-    if len(headwords) == 0:
-        logger.warning("No headwords found")
-        pass
-
-    # prepare statement
-    stmt = session.prepare(f"""
-    INSERT INTO {session.keyspace}.tbl_features
-    (
-        headword, example_id, sentence, sent_id,
-        spans, annot, biblio, license, score,
-        feats1, feats2, feats3, feats4,
-        feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14,
-        hashes15, hashes16, hashes18
-    )
-    VALUES (
-        ?, ?, ?, ?,
-        ?, ?, ?, ?, ?,
-        ?, ?, ?, ?,
-        ?, ?, ?, ?,
-        ?, ?, ?, ?,
-        ?, ?, ?
-    )
-    IF NOT EXISTS;
-    """)
-
-    # prepare batch statement
-    batches = {
-        k: cas.query.BatchStatement(
-            consistency_level=cas.query.ConsistencyLevel.ANY)
-        for k in headwords
-    }
-
-    # loop over each sentence
-    j_mask = 0  # index for `f1[j_mask]`
-    for i, text in enumerate(sentences):
-        # chop sentence length to `max_chars`
-        text = text[:max_chars]
-        # skip all sentences with less than 3 tokens
-        if len(text.split(" ")) < 3:
-            logger.warning(f"Sentence to short: '{text}'")
-            j_mask += len(l17[i])
-            continue
-        # skip if no headword was found
-        if len(l17[i]) == 0:
-            logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
-            j_mask += len(l17[i])
-            continue
-
-        # save a row for each headword
-        for k, headword in enumerate(l17[i]):
-            # add to batch
-            batches[headword].add(stmt, [
-                headword, uuid.uuid4(), text, uuid.UUID(sent_ids[i]),
-                [spans[i][k]], annot[i], biblio[i], licensetext[i], scores[i],
-                f1[j_mask],  # masked embeddings!
-                f2[i], f3[i], f4[i],
-                f5[i], f6[i], f7[i], f8[i],
-                f9[i], f12[i], f13[i], f14[i],
-                h15[i], h16[i], h18[i]
-            ])
-            j_mask += 1  # masked embeddings!
-
-    # execute
-    for headword, batch in batches.items():
-        if len(batch) > 0:
-            fb = session.execute_async(batch)
-            fb.add_errback(handle_err, headword=headword)
-    # done
-    pass
+    # # execute
+    # for headword, batch in batches.items():
+    #     if len(batch) > 0:
+    #         fb = session.execute_async(batch)
+    #         fb.add_errback(handle_err, headword=headword)
+    # # done
+    # pass
 
 
-def get_headwords(session: cas.cluster.Session,
-                  max_fetch_size: int = 1000000):
-    """ Lookup all unique lemmata from CQL database
-
-    Parameters:
-    -----------
-    session : cas.cluster.Session
-        A Cassandra Session object, i.e., an existing DB connection.
-        The session must have a default keyspace, i.e., `USE keyspace;`
-        or `session.set_keyspace(keyspace)`.
-
-    max_fetch_size : int (Default: int(1e6))
-        Maximum number of partitions to retrieve from cassandra
-
-    Example:
-    --------
-    import evidence_features as evf
-    import evidence_features.cql
-    conn = evf.cql.CqlConn(keyspace="evidence")
-    headwords = evf.cql.cas_get_headwords(
-        conn.get_session(), max_fetch_size=5000)
-    """
-    stmt = cas.query.SimpleStatement(
-        f"SELECT DISTINCT headword FROM {session.keyspace}.tbl_features",
-        fetch_size=max_fetch_size)
-    # fetch from CQL
-    headwords = []
-    for row in session.execute(stmt):
-        headwords.append(row.headword)
-    headwords = list(set(headwords))
-    # clean up
-    del stmt
-    gc.collect()
-    # done
-    return headwords
 
 
-def download_similarity_features(session: cas.cluster.Session,
-                                 headword: str,
-                                 max_fetch_size: int = 1000000):
-    # prepare statement
-    stmt = cas.query.SimpleStatement(f"""
-        SELECT sentence, biblio, score,
-               feats1, hashes15, hashes16, hashes18
-        FROM {session.keyspace}.tbl_features
-        WHERE headword='{headword}';
-        """, fetch_size=max_fetch_size)
-    # read fetched rows
-    sentences = []
-    biblio = []
-    scores = []
-    feats_semantic = []
-    hashes_grammar = []
-    hashes_duplicate = []
-    hashes_biblio = []
-    for row in session.execute(stmt):
-        sentences.append(row.sentence)
-        biblio.append(row.biblio)
-        scores.append(row.score)
-        feats_semantic.append(row.feats1)
-        hashes_grammar.append(row.hashes15)
-        hashes_duplicate.append(row.hashes16)
-        hashes_biblio.append(row.hashes18)
-    # convert and enforce data type
-    feats_semantic = sbert_i2b(np.array(feats_semantic, dtype=np.int8))
-    hashes_grammar = np.array(hashes_grammar, dtype=np.int32)
-    hashes_duplicate = np.array(hashes_duplicate, dtype=np.int32)
-    hashes_biblio = np.array(hashes_biblio, dtype=np.int32)
-    # clean up
-    del stmt
-    gc.collect()
-    # done
-    return (
-        sentences, biblio, scores,
-        feats_semantic, hashes_grammar, hashes_duplicate, hashes_biblio
-    )
+# ONLY NEEDED FOR JAVASCRIPT
+# https://github.com/satzbeleg/evidence-app/blob/0edcd64ded3abfe418c3605060a1485faaf78409/src/components/bestworst/transform.js
+# and RESTAPI
+# https://github.com/satzbeleg/evidence-restapi/blob/2fa975b19981c3cc4eb9080f61858c25890a7bca/app/transform.py
+# https://github.com/satzbeleg/evidence-restapi/blob/2fa975b19981c3cc4eb9080f61858c25890a7bca/app/routers/serialized_features.py
+# 
+# def get_headwords(session: cas.cluster.Session,
+#                   max_fetch_size: int = 1000000):
+#     """ Lookup all unique lemmata from CQL database
+
+#     Parameters:
+#     -----------
+#     session : cas.cluster.Session
+#         A Cassandra Session object, i.e., an existing DB connection.
+#         The session must have a default keyspace, i.e., `USE keyspace;`
+#         or `session.set_keyspace(keyspace)`.
+
+#     max_fetch_size : int (Default: int(1e6))
+#         Maximum number of partitions to retrieve from cassandra
+
+#     Example:
+#     --------
+#     import evidence_features as evf
+#     import evidence_features.cql
+#     conn = evf.cql.CqlConn(keyspace="evidence")
+#     headwords = evf.cql.cas_get_headwords(
+#         conn.get_session(), max_fetch_size=5000)
+#     """
+#     stmt = cas.query.SimpleStatement(
+#         f"SELECT DISTINCT headword FROM {session.keyspace}.tbl_features",
+#         fetch_size=max_fetch_size)
+#     # fetch from CQL
+#     headwords = []
+#     for row in session.execute(stmt):
+#         headwords.append(row.headword)
+#     headwords = list(set(headwords))
+#     # clean up
+#     del stmt
+#     gc.collect()
+#     # done
+#     return headwords
 
 
-def download_scoring_features(session: cas.cluster.Session,
-                              headword: str,
-                              max_fetch_size: int = 1000000):
-    # prepare statement
-    stmt = cas.query.SimpleStatement(f"""
-        SELECT feats1, feats2, feats3, feats4,
-               feats5, feats6, feats7, feats8,
-               feats9, feats12, feats13, feats14, sentence
-        FROM {session.keyspace}.tbl_features
-        WHERE headword='{headword}';
-        """, fetch_size=max_fetch_size)
-    # read fetched rows
-    sentences = []
-    feats1, feats2, feats3, feats4 = [], [], [], []
-    feats5, feats6, feats7, feats8 = [], [], [], []
-    feats9, feats12, feats13, feats14 = [], [], [], []
-    for row in session.execute(stmt):
-        sentences.append(row.sentence)
-        feats1.append(row.feats1)
-        feats2.append(row.feats2)
-        feats3.append(row.feats3)
-        feats4.append(row.feats4)
-        feats5.append(row.feats5)
-        feats6.append(row.feats6)
-        feats7.append(row.feats7)
-        feats8.append(row.feats8)
-        feats9.append(row.feats9)
-        feats12.append(row.feats12)
-        feats13.append(row.feats13)
-        feats14.append(row.feats14)
-    # convert to float
-    feats = i2f(
-        feats1, feats2, feats3, feats4,
-        feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14
-    ).astype(np.float32)
-    # clean up
-    del stmt, feats1, feats2, feats3, feats4
-    del feats5, feats6, feats7, feats8
-    del feats9, feats12, feats13, feats14
-    gc.collect()
-    # done
-    return sentences, feats
+# ONLY NEEDED FOR JAVASCRIPT
+# https://github.com/satzbeleg/evidence-app/blob/0edcd64ded3abfe418c3605060a1485faaf78409/src/components/bestworst/transform.js
+# and RESTAPI
+# https://github.com/satzbeleg/evidence-restapi/blob/2fa975b19981c3cc4eb9080f61858c25890a7bca/app/transform.py
+# https://github.com/satzbeleg/evidence-restapi/blob/2fa975b19981c3cc4eb9080f61858c25890a7bca/app/routers/serialized_features.py
+# 
+# def download_similarity_features(session: cas.cluster.Session,
+#                                  headword: str,
+#                                  max_fetch_size: int = 1000000):
+#     # prepare statement
+#     stmt = cas.query.SimpleStatement(f"""
+#         SELECT sentence, biblio, score,
+#                feats1, hashes15, hashes16, hashes18
+#         FROM {session.keyspace}.tbl_features
+#         WHERE headword='{headword}';
+#         """, fetch_size=max_fetch_size)
+#     # read fetched rows
+#     sentences = []
+#     biblio = []
+#     scores = []
+#     feats_semantic = []
+#     hashes_grammar = []
+#     hashes_duplicate = []
+#     hashes_biblio = []
+#     for row in session.execute(stmt):
+#         sentences.append(row.sentence)
+#         biblio.append(row.biblio)
+#         scores.append(row.score)
+#         feats_semantic.append(row.feats1)
+#         hashes_grammar.append(row.hashes15)
+#         hashes_duplicate.append(row.hashes16)
+#         hashes_biblio.append(row.hashes18)
+#     # convert and enforce data type
+#     feats_semantic = sbert_i2b(np.array(feats_semantic, dtype=np.int8))
+#     hashes_grammar = np.array(hashes_grammar, dtype=np.int32)
+#     hashes_duplicate = np.array(hashes_duplicate, dtype=np.int32)
+#     hashes_biblio = np.array(hashes_biblio, dtype=np.int32)
+#     # clean up
+#     del stmt
+#     gc.collect()
+#     # done
+#     return (
+#         sentences, biblio, scores,
+#         feats_semantic, hashes_grammar, hashes_duplicate, hashes_biblio
+#     )
+
+
+# ONLY NEEDED FOR JAVASCRIPT
+# https://github.com/satzbeleg/evidence-app/blob/0edcd64ded3abfe418c3605060a1485faaf78409/src/components/bestworst/transform.js
+# and RESTAPI
+# https://github.com/satzbeleg/evidence-restapi/blob/2fa975b19981c3cc4eb9080f61858c25890a7bca/app/transform.py
+# https://github.com/satzbeleg/evidence-restapi/blob/2fa975b19981c3cc4eb9080f61858c25890a7bca/app/routers/serialized_features.py
+# 
+# def download_scoring_features(session: cas.cluster.Session,
+#                               headword: str,
+#                               max_fetch_size: int = 1000000):
+#     # prepare statement
+#     stmt = cas.query.SimpleStatement(f"""
+#         SELECT feats1, feats2, feats3, feats4,
+#                feats5, feats6, feats7, feats8,
+#                feats9, feats12, feats13, feats14, sentence
+#         FROM {session.keyspace}.tbl_features
+#         WHERE headword='{headword}';
+#         """, fetch_size=max_fetch_size)
+#     # read fetched rows
+#     sentences = []
+#     feats1, feats2, feats3, feats4 = [], [], [], []
+#     feats5, feats6, feats7, feats8 = [], [], [], []
+#     feats9, feats12, feats13, feats14 = [], [], [], []
+#     for row in session.execute(stmt):
+#         sentences.append(row.sentence)
+#         feats1.append(row.feats1)
+#         feats2.append(row.feats2)
+#         feats3.append(row.feats3)
+#         feats4.append(row.feats4)
+#         feats5.append(row.feats5)
+#         feats6.append(row.feats6)
+#         feats7.append(row.feats7)
+#         feats8.append(row.feats8)
+#         feats9.append(row.feats9)
+#         feats12.append(row.feats12)
+#         feats13.append(row.feats13)
+#         feats14.append(row.feats14)
+#     # convert to float
+#     feats = i2f(
+#         feats1, feats2, feats3, feats4,
+#         feats5, feats6, feats7, feats8,
+#         feats9, feats12, feats13, feats14
+#     ).astype(np.float32)
+#     # clean up
+#     del stmt, feats1, feats2, feats3, feats4
+#     del feats5, feats6, feats7, feats8
+#     del feats9, feats12, feats13, feats14
+#     gc.collect()
+#     # done
+#     return sentences, feats
