@@ -1,6 +1,6 @@
 __version__ = '0.1.0'
 
-from .extract_from_conll import (
+from .extract_from_conll_sent import (
     get_words,  # -> f8, f9, (f12)
     get_sentence_and_lemmata,  # -> sentence, f5, f6, f7, f13, f14, h16, (f12)
     get_feats12,
