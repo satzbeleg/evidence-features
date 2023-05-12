@@ -46,7 +46,7 @@ data = """
 sentences = conllu.parse(data)
 
 
-def test1():
+def test_words():
     sent = sentences[0]
     words = evf.get_words(sent)
     assert words == [
@@ -80,7 +80,7 @@ def test1():
         'ergattern']
 
 
-def test2():
+def test_reconstructed():
     sent = sentences[0]
     reconstructed, lemmata, spans = evf.get_sentence_and_lemmata(
         sent, upos_list=["NOUN", "VERB", "ADJ", "DET"])
@@ -135,7 +135,7 @@ def test_feats12():
     assert feats12 == (212, 28)
 
 
-def test3():
+def test_group_spans():
     sent = sentences[0]
 
     _, lemmata0, spans0 = evf.get_sentence_and_lemmata(
@@ -143,7 +143,7 @@ def test3():
 
     lemmata, spans = evf.group_lemma_spans(lemmata0, spans0)
 
-    assert lemmata2 == [
+    assert lemmata == [
         'Aktie',
         'Aussicht',
         'Depot',
@@ -161,7 +161,7 @@ def test3():
         'gut',
         'liebäugeln',
         'wahrscheinlich']
-    assert spans2 ==  [
+    assert spans ==  [
         [(64, 69)],
         [(141, 151)],
         [(104, 109)],
@@ -181,7 +181,7 @@ def test3():
         [(165, 179)]]
     
 
-def test3():
+def test_masked():
     sent = sentences[0]
 
     reconstructed, lemmata0, spans0 = evf.get_sentence_and_lemmata(
@@ -210,3 +210,95 @@ def test3():
         'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " [MASK] , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
         'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der [MASK] begehrten Papiere zu ergattern .'
     ]
+
+
+def test_feats2():
+    sent = sentences[0]
+    feats2 = evf.get_feats2(sent)
+    assert feats2 == [35, 5, 4, 0, 1, 0, 6, 0, 7, 0, 1, 1, 2, 5, 0, 2, 1]
+
+
+def test_feats3():
+    sent = sentences[0]
+    feats3 = evf.get_feats3(sent)
+    assert feats3 == [35, 2, 2, 1, 0, 4, 0, 0, 0, 1, 5, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 0, 2, 0, 0, 0, 5, 1, 4, 14, 6, 0, 0, 2, 1, 7, 2, 1, 4, 1, 0, 2, 0]
+
+
+def test_adjac():
+    sent = sentences[0]
+    adjac = evf.get_adjac(sent)
+    assert adjac == [
+        (1, 15, 'nsubj'),
+        (2, 5, 'case'),
+        (3, 5, 'det'),
+        (4, 5, 'amod'),
+        (5, 15, 'obl'),
+        (6, 8, 'det'),
+        (7, 8, 'amod'),
+        (8, 5, 'nmod'),
+        (9, 12, 'case'),
+        (10, 12, 'det'),
+        (11, 12, 'punct'),
+        (12, 5, 'nmod'),
+        (13, 12, 'appos'),
+        (14, 12, 'punct'),
+        (15, 17, 'csubj'),
+        (16, 15, 'punct'),
+        (17, 0, 'root'),
+        (18, 20, 'case'),
+        (19, 20, 'det'),
+        (20, 17, 'obl'),
+        (21, 22, 'case'),
+        (22, 20, 'nmod'),
+        (23, 22, 'flat:name'),
+        (24, 25, 'amod'),
+        (25, 17, 'obj'),
+        (26, 33, 'punct'),
+        (27, 33, 'obj'),
+        (28, 31, 'det'),
+        (29, 30, 'advmod'),
+        (30, 31, 'amod'),
+        (31, 27, 'nmod'),
+        (32, 33, 'mark'),
+        (33, 25, 'xcomp'),
+        (34, 17, 'punct')]
+    
+
+def test_edges():
+    sent = sentences[0]
+    edges = evf.get_edges(sent)
+    assert edges == [
+        (15, 1),
+        (5, 2),
+        (5, 3),
+        (5, 4),
+        (15, 5),
+        (8, 6),
+        (8, 7),
+        (5, 8),
+        (12, 9),
+        (12, 10),
+        (12, 11),
+        (5, 12),
+        (12, 13),
+        (12, 14),
+        (17, 15),
+        (15, 16),
+        (0, 17),
+        (20, 18),
+        (20, 19),
+        (17, 20),
+        (22, 21),
+        (20, 22),
+        (22, 23),
+        (25, 24),
+        (17, 25),
+        (33, 26),
+        (33, 27),
+        (31, 28),
+        (30, 29),
+        (31, 30),
+        (27, 31),
+        (33, 32),
+        (25, 33),
+        (17, 34)]
