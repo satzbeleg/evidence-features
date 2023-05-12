@@ -13,3 +13,9 @@ from .extract_from_conll_sent import (
     get_edges,  # -> f4
     extract_from_sentence  # wrapper
 )
+
+from .extract_from_conll_doc import (
+    get_ddc_biblio,
+    get_ddc_license,
+    read_conll_file
+)

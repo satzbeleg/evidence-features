@@ -269,7 +269,7 @@ def extract_from_sentence(sent: conllu.TokenList) -> dict:
     edges = get_edges(sent)  # -> f4
 
     # prepare outputs
-    sent_id = uuid.uuid5(uuid.NAMESPACE_URL, reconstructed)
+    sent_id = str(uuid.uuid5(uuid.NAMESPACE_URL, reconstructed))
     return (
         {
             "sentence": reconstructed,  # -> f5, f6, f7, f13, f14, h16
