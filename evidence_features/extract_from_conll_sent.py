@@ -1,5 +1,6 @@
 import conllu
 from typing import List
+import uuid
 
 
 # words
@@ -267,9 +268,12 @@ def extract_from_sentence(sent: conllu.TokenList) -> dict:
     adjac = get_adjac(sent) # -> h15
     edges = get_edges(sent)  # -> f4
 
+    # prepare outputs
+    sent_id = uuid.uuid5(uuid.NAMESPACE_URL, reconstructed)
     return (
         {
             "sentence": reconstructed,  # -> f5, f6, f7, f13, f14, h16
+            "sent_id": sent_id,
             "lemmata": lemmata,  # headword/17
             "spans": spans,  # spans
             "annot": annot,  # annot
@@ -277,8 +281,20 @@ def extract_from_sentence(sent: conllu.TokenList) -> dict:
             "feats3": feats3,
             "feats12": feats12,
         }, 
-        words,  # -> f8, f9
-        masked,  # -> f1
-        adjac,  # -> h15
-        edges,  # -> f4
+        {
+            "sent_id": sent_id, 
+            "words": words
+        },  # -> f8, f9
+        [
+            {"sent_id": sent_id, "headword": lem, "masked": mask}
+            for lem, mask in zip(lemmata, masked)
+        ],  # -> f1
+        {
+            "sent_id": sent_id, 
+            "adjac": adjac
+        },  # -> h15
+        {
+            "sent_id": sent_id, 
+            "edges": edges
+        },  # -> f4
     )
