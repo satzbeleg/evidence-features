@@ -11,4 +11,5 @@ from .extract_from_conll_sent import (
     get_annot,  # annot
     get_adjac,  # -> h15
     get_edges,  # -> f4
+    extract_from_sentence  # wrapper
 )

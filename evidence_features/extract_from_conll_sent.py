@@ -282,6 +282,3 @@ def extract_from_sentence(sent: conllu.TokenList) -> dict:
         adjac,  # -> h15
         edges,  # -> f4
     )
-
-def extract_from_document():
-    pass
