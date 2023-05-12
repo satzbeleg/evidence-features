@@ -80,3 +80,133 @@ def test1():
         'ergattern']
 
 
+def test2():
+    sent = sentences[0]
+    reconstructed, lemmata, spans = evf.get_sentence_and_lemmata(
+        sent, upos_list=["NOUN", "VERB", "ADJ", "DET"])
+    assert reconstructed == 'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .'
+    assert lemmata == [
+        'bevorstehen',
+        'Gang',
+        'der',
+        'deutsch',
+        'Post',
+        'der',
+        'Aktie',
+        'Gelb',
+        'liebäugeln',
+        'ein',
+        'Depot',
+        'gut',
+        'Aussicht',
+        'einige',
+        'der',
+        'wahrscheinlich',
+        'begehren',
+        'Papier',
+        'ergattern']
+    assert spans == [
+        (9, 23),
+        (24, 34),
+        (35, 38),
+        (39, 48),
+        (49, 53),
+        (58, 61),
+        (64, 69),
+        (70, 74),
+        (77, 87),
+        (98, 103),
+        (104, 109),
+        (133, 140),
+        (141, 151),
+        (154, 160),
+        (161, 164),
+        (165, 179),
+        (180, 189),
+        (190, 197),
+        (201, 210)]
+
+
+def test_feats12():
+    sent = sentences[0]
+    words = evf.get_words(sent)
+    reconstructed, _, _ = evf.get_sentence_and_lemmata(sent)
+    feats12 = evf.get_feats12(reconstructed, words)
+    assert feats12 == (212, 28)
+
+
+def test3():
+    sent = sentences[0]
+
+    _, lemmata0, spans0 = evf.get_sentence_and_lemmata(
+        sent, upos_list=["NOUN", "VERB", "ADJ", "DET"])
+
+    lemmata, spans = evf.group_lemma_spans(lemmata0, spans0)
+
+    assert lemmata2 == [
+        'Aktie',
+        'Aussicht',
+        'Depot',
+        'Gang',
+        'Gelb',
+        'Papier',
+        'Post',
+        'begehren',
+        'bevorstehen',
+        'der',
+        'deutsch',
+        'ein',
+        'einige',
+        'ergattern',
+        'gut',
+        'liebäugeln',
+        'wahrscheinlich']
+    assert spans2 ==  [
+        [(64, 69)],
+        [(141, 151)],
+        [(104, 109)],
+        [(24, 34)],
+        [(70, 74)],
+        [(190, 197)],
+        [(49, 53)],
+        [(180, 189)],
+        [(9, 23)],
+        [(161, 164), (58, 61), (35, 38)],
+        [(39, 48)],
+        [(98, 103)],
+        [(154, 160)],
+        [(201, 210)],
+        [(133, 140)],
+        [(77, 87)],
+        [(165, 179)]]
+    
+
+def test3():
+    sent = sentences[0]
+
+    reconstructed, lemmata0, spans0 = evf.get_sentence_and_lemmata(
+        sent, upos_list=["NOUN", "VERB", "ADJ", "DET"])
+
+    _, spans = evf.group_lemma_spans(lemmata0, spans0)
+
+    masked = evf.get_masks(reconstructed, spans)
+
+    assert masked == [
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " [MASK] Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere [MASK] , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem [MASK] bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden [MASK] der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie [MASK] " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten [MASK] zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen [MASK] mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich [MASK] Papiere zu ergattern .',
+        'Wer beim [MASK] Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang [MASK] Deutschen Post mit [MASK] " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige [MASK] wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der [MASK] Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit [MASK] Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , [MASK] der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu [MASK] .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade [MASK] Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " [MASK] , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der wahrscheinlich begehrten Papiere zu ergattern .',
+        'Wer beim bevorstehenden Börsengang der Deutschen Post mit der " Aktie Gelb " liebäugelt , hat mit einem Depot bei Postbank Easytrade bessere Aussichten , einige der [MASK] begehrten Papiere zu ergattern .'
+    ]
