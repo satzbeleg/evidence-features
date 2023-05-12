@@ -3,18 +3,22 @@ numpy>=1.21.6,<2
 torch>=1,<2
 dvc[ssh]>=2,<3
 
+conllu>=4,<5
+ray>=2,<3
+psutil>=5
+
 # database backend
-cassandra-driver>=3.25.0,<4
+#cassandra-driver>=3.25.0,<4
 
 # file export
 jsonlines>=3,<4
 
 # SBert (semantics)
 sentence-transformers>=2.2.0,<3
-keras-hrp>=0.1.0,<1
+torch-hrp>=0.1.0,<1
+bool-to-int8-ray>=0.1.0,<1
 
 # node-dist, pos tags, morphosyntax features
-trankit>=1.1.1,<2
 node-distance>=0.1.0,<1
 
 # IPA consonant clusters (phonetics)
