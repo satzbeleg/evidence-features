@@ -33,36 +33,6 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
 
-
-
-Wie wird SBert parallel auf mehren GPUs ausgeführt?
-
-[siehe hier](https://github.com/UKPLab/sentence-transformers/blob/d928410803bb90f555926d145ee7ad3bd1373a83/examples/applications/computing-embeddings/computing_embeddings_mutli_gpu.py#L16)
-CHUNK_SIZE
-
-Ab einer bestimmte Batch-Size kann sich die Laufzeit exponentiell erhöhen. 
-Hier ist auch die Busbreite zwischen GPU und GPU-RAM zu berücksichtigen.
-Für CPUs und einer Sequence Length von 128, sollte Batch Size kleiner gleich 32 sein 
-(z.B. [hier](https://huggingface.co/blog/bert-cpu-scaling-part-1)).
-
-
-```py
-BATCH_SIZE = int(os.environ("BATCH_SIZE", "32"))  # keep it bs=32 default setting
-CHUNK_SIZE = int(os.environ("CHUNK_SIZE", "8192"))   # 2**13=8192; try large values: 65536 131072 262144 524288 1048576
-
-def myfun(...):
-        ...
-    pool = model.start_multi_process_pool()
-    emb = model.encode_multi_process(
-        sentences, pool, batch_size=BATCH_SIZE, chunk_size=CHUNK_SIZE)
-    model.stop_multi_process_pool(pool)
-    ...
-
-if __name__ == '__main__':  # multiprocessing spawning requires main
-    myfun()
-```
-
-
 ## Download pretrained models and statistics
 
 
