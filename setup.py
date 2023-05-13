@@ -56,7 +56,10 @@ setuptools.setup(
         "kshingle>=0.10.0,<1",
         "jsonlines>=3,<4"
     ],
-    # scripts=['scripts/examplescript.py'],
+    scripts=[
+        'scripts/read_conll_file.py',
+        'scripts/masked_to_feats1_sbert_hrp.py'
+    ],
     python_requires='>=3.7',
     zip_safe=True
 )

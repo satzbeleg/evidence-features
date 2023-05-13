@@ -3,31 +3,8 @@ Linguistic feature extraction for German (lang: de) as 8-bit interger representa
 
 
 ## Install a virtual environment for CPU
+not supported
 
-```sh
-# Ensure that python packages are availabe
-sudo apt install python3-venv
-
-# install virtualenv
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-
-# install other packages
-pip install --use-pep517 -e .
-# pip install --use-pep517 -r requirements.txt --no-cache-dir
-pip install --use-pep517 -r requirements-dev.txt --no-cache-dir
-pip install --use-pep517 -r requirements-demo.txt --no-cache-dir
-
-# reinstall TF for better Intel-CPU support
-# pip install intel-tensorflow
-```
-
-And, or install python package `evidence-features` from Github.
-
-```sh
-pip install git+ssh://git@github.com/satzbeleg/evidence-features.git
-```
 
 ### Install MiniConda for GPU
 In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not maintain PyPi packages).
@@ -45,7 +22,6 @@ pip install torch==1.12.1+cu113 torchvision torchaudio -f https://download.pytor
 pip install -e .
 # pip install -r requirements.txt --no-cache-dir
 pip install -r requirements-dev.txt --no-cache-dir
-pip install -r requirements-demo.txt --no-cache-dir
 ```
 
 Install MiniConda if not exists
@@ -54,6 +30,36 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 # prevent conda autostart in shell
 # conda config --set auto_activate_base false
+```
+
+
+
+
+Wie wird SBert parallel auf mehren GPUs ausgeführt?
+
+[siehe hier](https://github.com/UKPLab/sentence-transformers/blob/d928410803bb90f555926d145ee7ad3bd1373a83/examples/applications/computing-embeddings/computing_embeddings_mutli_gpu.py#L16)
+CHUNK_SIZE
+
+Ab einer bestimmte Batch-Size kann sich die Laufzeit exponentiell erhöhen. 
+Hier ist auch die Busbreite zwischen GPU und GPU-RAM zu berücksichtigen.
+Für CPUs und einer Sequence Length von 128, sollte Batch Size kleiner gleich 32 sein 
+(z.B. [hier](https://huggingface.co/blog/bert-cpu-scaling-part-1)).
+
+
+```py
+BATCH_SIZE = int(os.environ("BATCH_SIZE", "32"))  # keep it bs=32 default setting
+CHUNK_SIZE = int(os.environ("CHUNK_SIZE", "8192"))   # 2**13=8192; try large values: 65536 131072 262144 524288 1048576
+
+def myfun(...):
+        ...
+    pool = model.start_multi_process_pool()
+    emb = model.encode_multi_process(
+        sentences, pool, batch_size=BATCH_SIZE, chunk_size=CHUNK_SIZE)
+    model.stop_multi_process_pool(pool)
+    ...
+
+if __name__ == '__main__':  # multiprocessing spawning requires main
+    myfun()
 ```
 
 
