@@ -91,7 +91,7 @@ def sbert_to_bool_gpu(sentences: List[str]):
     start = timer()
     pool = model_hrp.start_pool()
     feats_hashed = model_hrp.infer(
-        feats_float, pool, 
+        torch.tensor(feats_float), pool, 
         chunk_size=args.hrp_chunk_size)
     model_hrp.stop_pool(pool)
     torch.cuda.empty_cache()
