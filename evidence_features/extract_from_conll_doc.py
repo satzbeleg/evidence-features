@@ -8,6 +8,12 @@ import logging
 
 # start logger
 logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename="layerwise-training-v0.6.2.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s: %(message)s",
+    datefmt="%y-%m-%d %H:%M:%S"
+)
 
 
 def get_ddc_license(sent: conllu.TokenList) -> str:
