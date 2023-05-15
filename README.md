@@ -11,8 +11,8 @@ In to ensure compatible CUDA drivers, use Conda to install them (Nvidia does not
 
 ```sh
 conda install -y pip
-conda create -y --name gpu-venv-evidence-features python=3.9 pip
-conda activate gpu-venv-evidence-features
+conda create -y --name gpu-venv-evidence-features-ray python=3.9 pip
+conda activate gpu-venv-evidence-features-ray
 
 conda install -y cudatoolkit=11.3.1 cudnn=8.3.2 -c conda-forge
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
@@ -48,7 +48,7 @@ conda activate gpu-venv-evidence-features
 # source .venv/bin/activate
 
 # set the location for pretrained models and other lists
-export MODELFOLDER="$(pwd)/models"
+# export MODELFOLDER="$(pwd)/models"
 # download
 bash download-models.sh
 

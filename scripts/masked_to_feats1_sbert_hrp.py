@@ -17,6 +17,8 @@ import numpy as np
 
 # start logger
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+logger.info("Start")
 
 
 # parse input arguments
