@@ -41,6 +41,9 @@ parser.add_argument(
     '--batch-size', default=int(18e6), type=int
 )  # 18 Mio
 parser.add_argument(
+    '--max-memory', default=int(30), type=int
+)  # 18 Mio
+parser.add_argument(
     '--sbert-chunk-size', default=int(12000), type=int
 )  # try int(12000)  for 2x GPUs with 80 Gb each (peak 74 Gb)
 parser.add_argument(
@@ -48,6 +51,9 @@ parser.add_argument(
 )  # try int(45e5) for 2x GPUs with 80 Gb each (peak 68 Gb)
 args = parser.parse_args()
 
+
+# max memory in Gb
+max_mem = float(args.max_memory * 1073741824.)
 
 
 # CUDA settings
@@ -128,18 +134,20 @@ def sbert_to_bool(sentences: List[str]):
 
 if __name__ == '__main__':  # multiprocessing spawning requires main
     # loop over all batches
-    masked, data = [], []
+    masked, data, varsz = [], [], 50.
     with jsonlines.open(args.input_file) as reader:
-        for obj in reader:  
-            masked.append(obj.pop("masked"))
+        for obj in reader: 
+            s = obj.pop("masked") 
+            masked.append(s)
             data.append(obj)
-            if len(masked) >= args.batch_size:
+            varsz += len(s)
+            if (len(masked) >= args.batch_size) or (varsz >= max_mem):
                 hashed = sbert_to_bool(masked)  # compute!
                 # save results
                 with jsonlines.open(args.output_file, mode='a') as writer:
                     for i, ex in enumerate(data):
                         writer.write({**ex, "hashed": hashed[i].astype(np.int8).tolist()})
-                    masked, data = [], []  # reset
+                    masked, data, varsz = [], [], 50.  # reset
     # process the last examples
     if len(masked) > 0:
         hashed = sbert_to_bool(masked)  # compute!
