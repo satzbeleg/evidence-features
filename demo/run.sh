@@ -16,3 +16,6 @@ masked_to_feats1_sbert_hrp.py \
     --hrp-filepath=../models/hrp.pth \
     --batch-size=3
 
+edges_to_feats4_nodedist.py \
+    --input-file=$CORPUSNAME/edges.jsonl \
+    --output-file=$CORPUSNAME/feats4.jsonl
