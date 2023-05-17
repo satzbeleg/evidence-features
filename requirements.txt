@@ -19,7 +19,7 @@ torch-hrp>=0.1.0,<1
 bool-to-int8-ray>=0.1.0,<1
 
 # node-dist, pos tags, morphosyntax features
-node-distance>=0.1.0,<1
+node-distance-ray>=0.1.0,<1
 
 # IPA consonant clusters (phonetics)
 epitran>=1.18,<=1.22
