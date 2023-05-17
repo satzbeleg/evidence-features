@@ -137,6 +137,7 @@ def sbert_to_bool(sentences: List[str]):
 
 if __name__ == '__main__':  # multiprocessing spawning requires main
     logger.info("Start")
+    start = timer()
 
     # loop over all batches
     masked, data, varsz = [], [], 50.
@@ -162,7 +163,7 @@ if __name__ == '__main__':  # multiprocessing spawning requires main
                 writer.write({**ex, "hashed": hashed[i].astype(np.int8).tolist()})
             masked, data = [], []  # reset
 
-    logger.info("End")
+    logger.info(f"End: {timer() - start: .6f} sec. elapsed")
 
 # Speed Tests
 # Sbert: 187.872131 seconds (1 Mio Examples; Chunk size: 12k)

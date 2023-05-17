@@ -35,6 +35,7 @@ args = parser.parse_args()
 
 if __name__ == '__main__':
     logger.info("Start")
+    start = timer()
 
     # read data
     with jsonlines.open(args.input_file) as reader:
@@ -69,4 +70,4 @@ if __name__ == '__main__':
     # done
     ray.shutdown()
     gc.collect()
-    logger.info("End")
+    logger.info(f"End: {timer() - start: .6f} sec. elapsed")
