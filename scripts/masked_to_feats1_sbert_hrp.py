@@ -22,7 +22,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s: %(message)s",
     datefmt="%y-%m-%d %H:%M:%S"
 )
-logger.info("Start")
 
 
 # parse input arguments
@@ -137,6 +136,8 @@ def sbert_to_bool(sentences: List[str]):
 
 
 if __name__ == '__main__':  # multiprocessing spawning requires main
+    logger.info("Start")
+
     # loop over all batches
     masked, data, varsz = [], [], 50.
     with jsonlines.open(args.input_file) as reader:
@@ -160,6 +161,8 @@ if __name__ == '__main__':  # multiprocessing spawning requires main
             for i, ex in enumerate(data):
                 writer.write({**ex, "hashed": hashed[i].astype(np.int8).tolist()})
             masked, data = [], []  # reset
+
+    logger.info("End")
 
 # Speed Tests
 # Sbert: 187.872131 seconds (1 Mio Examples; Chunk size: 12k)
