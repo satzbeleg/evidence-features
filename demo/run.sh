@@ -16,6 +16,12 @@ masked_to_feats1_sbert_hrp.py \
     --hrp-filepath=../models/hrp.pth \
     --batch-size=3
 
+export B2I8_PCT_CPU=0.95
+hashed_to_feats1.py \
+    --input-file=$CORPUSNAME/hashed.jsonl \
+    --output-file=$CORPUSNAME/feats1.jsonl
+
+export NDIST_PCT_CPU=0.95
 edges_to_feats4_nodedist.py \
     --input-file=$CORPUSNAME/edges.jsonl \
     --output-file=$CORPUSNAME/feats4.jsonl

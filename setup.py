@@ -59,6 +59,7 @@ setuptools.setup(
     scripts=[
         'scripts/read_conll_file.py',
         'scripts/masked_to_feats1_sbert_hrp.py',
+        "scripts/hashed_to_feats1.py",
         'scripts/edges_to_feats4_nodedist.py',
     ],
     python_requires='>=3.7',
