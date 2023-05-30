@@ -29,8 +29,10 @@ parser.add_argument(
 parser.add_argument(
     '--output-file', default="./feats4.jsonl", type=str
 )
+parser.add_argument(
+    '--batch-size', default=500000, type=int
+)
 args = parser.parse_args()
-
 
 
 if __name__ == '__main__':
@@ -43,17 +45,27 @@ if __name__ == '__main__':
         for obj in reader: 
             hashed.append(obj.pop("hashed"))
             data.append(obj)
+            # start processing the batch
+            if len(hashed) == args.batch_size:
+                serialized = b2i8.bool_to_int8_batch(np.array(hashed))
+                del hashed
+                # save batch results
+                with jsonlines.open(args.output_file, mode='a') as writer:
+                    for obj, val in zip(data, serialized):
+                        writer.write({**obj, "feats1": val.tolist()})
+                # reset
+                del data, serialized
+                hashed, data = [], []
 
-    # process with ray.io
-    serialized = b2i8.bool_to_int8_batch(np.array(hashed))
-    del hashed
-
-    # write data
-    with jsonlines.open(args.output_file, mode='a') as writer:
-        for obj, val in zip(data, serialized):
-            writer.write({**obj, "feats1": val.tolist()})
-
-    del serialized
+    if len(hashed) > 0:
+        # process with ray.io
+        serialized = b2i8.bool_to_int8_batch(np.array(hashed))
+        del hashed
+        # write data
+        with jsonlines.open(args.output_file, mode='a') as writer:
+            for obj, val in zip(data, serialized):
+                writer.write({**obj, "feats1": val.tolist()})
+        del data, serialized
 
     # done
     ray.shutdown()
