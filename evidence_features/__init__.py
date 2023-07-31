@@ -20,14 +20,14 @@ from .extract_from_conll_doc import (
     read_conll_file
 )
 
-# scripts/masked_to_feats1_sbert_hrp.py
-# edges_to_feats4_nodedist.py
-# sentence_to_feats5.py
-# sentence_to_feats6.py
-# sentence_to_feats7.py
-# sentence_to_feats13.py
-# sentence_to_feats14.py
-# sentence_to_hashes16.py
-# words_to_feats8_cow.py
-# words_to_feats9_smor.py
-# adjac_to_hashes15.py
+# [x] scripts/masked_to_feats1_sbert_hrp.py
+# [x] scripts/edges_to_feats4_nodedist.py
+# [ ] scripts/sentence_to_feats5.py
+# [ ] scripts/sentence_to_feats6.py
+# [ ] scripts/sentence_to_feats7.py
+# [ ] scripts/sentence_to_feats13.py
+# [ ] scripts/sentence_to_feats14.py
+# [ ] scripts/sentence_to_hashes16.py
+# [ ] scripts/words_to_feats8_cow.py
+# [ ] scripts/words_to_feats9_smor.py
+# [ ] scripts/adjac_to_hashes15.py
