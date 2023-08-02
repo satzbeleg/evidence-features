@@ -29,6 +29,9 @@ parser.add_argument(
 parser.add_argument(
     '--output-file', default="./feats4.jsonl", type=str
 )
+parser.add_argument(
+    '--batch-size', default=500000, type=int
+)
 args = parser.parse_args()
 
 
@@ -46,26 +49,46 @@ if __name__ == '__main__':
             batch_numnodes.append([max(itertools.chain(*tmp))])
             data.append(obj)
 
-    # process with ray.io
-    results = ndr.node_token_distances(
-        batch_edges, batch_numnodes, cutoff=25)
-    del batch_edges, batch_numnodes
-    nodedist = [res[0] for res in results]
-    tokendist = [res[1] for res in results]
-    del results
+            # start processing the batch
+            if len(data) == args.batch_size:
+                # process with ray.io
+                results = ndr.node_token_distances(
+                    batch_edges, batch_numnodes, cutoff=25)
+                del batch_edges, batch_numnodes
 
-    results2 = ndr.tokenvsnode_distribution(
-        tokendist, nodedist, xmin=-5, xmax=15)
-    del tokendist, nodedist
+                nodedist = [res[0] for res in results]
+                tokendist = [res[1] for res in results]
+                del results
 
-    # write data
-    with jsonlines.open(args.output_file, mode='a') as writer:
-        for obj, res in zip(data, results2):
-            d = np.minimum(127, np.maximum(-128, res[2])).astype(np.int8).tolist()
-            obj["feats4"] = d
-            writer.write(obj)
+                results2 = ndr.tokenvsnode_distribution(
+                    tokendist, nodedist, xmin=-5, xmax=15)
+                del tokendist, nodedist
 
-    del results2
+                # write data
+                with jsonlines.open(args.output_file, mode='a') as writer:
+                    for obj, res in zip(data, results2):
+                        dist = np.minimum(127, np.maximum(-128, res[2])).astype(
+                            np.int8).tolist()
+                        obj["feats4"] = dist
+                        writer.write(obj)
+
+                del results2, data
+                batch_edges, batch_numnodes, data = [], [], []
+
+    if len(data) > 0:
+        results = ndr.node_token_distances(
+            batch_edges, batch_numnodes, cutoff=25)
+        nodedist = [res[0] for res in results]
+        tokendist = [res[1] for res in results]
+        results2 = ndr.tokenvsnode_distribution(
+            tokendist, nodedist, xmin=-5, xmax=15)
+        with jsonlines.open(args.output_file, mode='a') as writer:
+            for obj, res in zip(data, results2):
+                dist = np.minimum(127, np.maximum(-128, res[2])).astype(
+                    np.int8).tolist()
+                obj["feats4"] = dist
+                writer.write(obj)
+
 
     # done
     ray.shutdown()

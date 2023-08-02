@@ -61,6 +61,10 @@ setuptools.setup(
         'scripts/masked_to_feats1_sbert_hrp.py',
         "scripts/hashed_to_feats1.py",
         'scripts/edges_to_feats4_nodedist.py',
+        'scripts/sentence_to_feats5_consonants.py',
+        'scripts/sentence_to_feats67_derechar.py',
+        'scripts/words_to_feats8_cow.py',
+        'scripts/words_to_feats9_smor.py',
     ],
     python_requires='>=3.7',
     zip_safe=True

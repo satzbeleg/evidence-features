@@ -28,6 +28,9 @@ parser.add_argument(
 parser.add_argument(
     '--output-file', default="./feats5.jsonl", type=str
 )
+parser.add_argument(
+    '--batch-size', default=500000, type=int
+)
 args = parser.parse_args()
 
 
@@ -43,7 +46,8 @@ ray.init(num_cpus=NUM_CPU)
 model_epi = epitran.Epitran('deu-Latn')
 
 
-def clip(x):
+# util fun
+def clip_int16(x):
     return max(-32768, min(32767, x))
 
 
@@ -59,10 +63,10 @@ def get_consonant_clusters_wrapper(sent: str):
         phonlen=3, min_cluster_len=1)
     # done
     return (
-        clip(len(ipatxt)),
-        clip(clusters.get(1, 0)),
-        clip(clusters.get(2, 0)),
-        clip(clusters.get(3, 0))
+        clip_int16(len(ipatxt)),
+        clip_int16(clusters.get(1, 0)),
+        clip_int16(clusters.get(2, 0)),
+        clip_int16(clusters.get(3, 0))
     )
 
 
@@ -90,17 +94,27 @@ if __name__ == '__main__':
             batch_sentences.append(sent)
             data.append({"sent_id": sent_id})
 
-    # process with ray.io
-    results = get_consonant_clusters(batch_sentences)
-    del batch_sentences
+            # start processing the batch
+            if len(data) == args.batch_size:
+                # process with ray.io
+                results = get_consonant_clusters(batch_sentences)
+                del batch_sentences
 
-    # write data
-    with jsonlines.open(args.output_file, mode='a') as writer:
-        for obj, res in zip(data, results):
-            obj["feats5"] = res
-            writer.write(obj)
+                # write data
+                with jsonlines.open(args.output_file, mode='a') as writer:
+                    for obj, res in zip(data, results):
+                        obj["feats5"] = res
+                        writer.write(obj)
 
-    del results
+                del results, data
+                batch_sentences, data = [], []
+
+    if len(data) > 0:
+        results = get_consonant_clusters(batch_sentences)
+        with jsonlines.open(args.output_file, mode='a') as writer:
+            for obj, res in zip(data, results):
+                obj["feats5"] = res
+                writer.write(obj)
 
     # done
     ray.shutdown()
