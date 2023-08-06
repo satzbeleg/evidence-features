@@ -9,6 +9,7 @@ read_conll_file.py \
     --output-dir=$CORPUSNAME \
     --io-batch-size=2
 
+# Step 2 - compute features
 masked_to_feats1_sbert_hrp.py \
     --input-file=$CORPUSNAME/masked.jsonl \
     --output-file=$CORPUSNAME/hashed.jsonl \
@@ -77,4 +78,12 @@ export MHASH_PCT_CPU=0.95
 sentence_to_feats16_minhash.py \
     --input-file=$CORPUSNAME/extracted.jsonl \
     --output-file=$CORPUSNAME/feats16.jsonl  \
+    --batch-size=2
+
+export MHASH_PCT_CPU=0.95
+sentence_to_feats16_minhash.py \
+    --input-file=$CORPUSNAME/extracted.jsonl \
+    --output-file=$CORPUSNAME/feats18.jsonl  \
+    --data-key=biblio \
+    --output-key=feats18 \
     --batch-size=2

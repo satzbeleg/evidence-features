@@ -35,7 +35,10 @@ parser.add_argument(
     '--batch-size', default=500000, type=int
 )
 parser.add_argument(
-    '--key-name', default="feats16", type=str
+    '--data-key', default="sentence", type=str
+)
+parser.add_argument(
+    '--output-key', default="feats16", type=str
 )
 args = parser.parse_args()
 
@@ -94,7 +97,7 @@ if __name__ == '__main__':
     with jsonlines.open(args.input_file) as reader:
         batch_sentences, data = [], []
         for obj in reader:
-            sent = obj.pop("sentence")
+            sent = obj.pop(args.data_key)
             sent_id = obj.pop("sent_id")
             batch_sentences.append(sent)
             data.append({"sent_id": sent_id})
@@ -108,7 +111,7 @@ if __name__ == '__main__':
                 # write data
                 with jsonlines.open(args.output_file, mode='a') as writer:
                     for obj, res in zip(data, results):
-                        obj[args.key_name] = res
+                        obj[args.output_key] = res
                         writer.write(obj)
 
                 del results, data
@@ -118,7 +121,7 @@ if __name__ == '__main__':
         results = get_kshingle_hashes(batch_sentences)
         with jsonlines.open(args.output_file, mode='a') as writer:
             for obj, res in zip(data, results):
-                obj[args.key_name] = res
+                obj[args.output_key] = res
                 writer.write(obj)
 
     # done
