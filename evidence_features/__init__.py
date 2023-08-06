@@ -25,8 +25,8 @@ from .extract_from_conll_doc import (
 # [x] scripts/sentence_to_feats5.py
 # [x] scripts/sentence_to_feats6.py
 # [x] scripts/sentence_to_feats7.py
-# [ ] scripts/sentence_to_feats13.py
-# [ ] scripts/sentence_to_feats14.py
+# [x] scripts/sentence_to_feats13.py
+# [x] scripts/sentence_to_feats14.py
 # [ ] scripts/sentence_to_hashes16.py
 # [x] scripts/words_to_feats8_cow.py
 # [x] scripts/words_to_feats9_smor.py

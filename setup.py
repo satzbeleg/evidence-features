@@ -65,6 +65,10 @@ setuptools.setup(
         'scripts/sentence_to_feats67_derechar.py',
         'scripts/words_to_feats8_cow.py',
         'scripts/words_to_feats9_smor.py',
+        'scripts/sentence_to_feats13_lang.py',
+        'scripts/sentence_to_feats14_emoji.py',
+        'scripts/sentence_to_feats15_treesimi.py',
+        'scripts/sentence_to_feats16_minhash.py',
     ],
     python_requires='>=3.7',
     zip_safe=True

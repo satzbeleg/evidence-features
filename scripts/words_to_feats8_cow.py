@@ -68,6 +68,9 @@ else:
     with open(MODELPATH2, "w") as fp:
         json.dump(decow, fp)
 
+
+decow_id = ray.put(decow)
+
 # brackets = np.percentile(
 #     [num for _, num in decow.items()],
 #     q=[100 / 6, 100 / 3, 50, 200 / 3, 500 / 6, 100])
@@ -95,7 +98,7 @@ def find_percentile(f, brackets):
 
 
 @ray.remote
-def cow_to_int8_wrapper(words: List[str]):
+def cow_to_int8_wrapper(words: List[str], decow):
     # lookup frequency
     freqs = [decow.get(stemmer.stem(w), 0) for w in words]
     # assign to percentile
@@ -115,7 +118,7 @@ def cow_to_int8_wrapper(words: List[str]):
 def cow_to_int8(batch_words: List[str]):
     try:
         return ray.get([
-            cow_to_int8_wrapper.remote(words)
+            cow_to_int8_wrapper.remote(words, decow_id)
             for words in batch_words])
     except Exception as e:
         logger.error(e)
