@@ -22,7 +22,7 @@ def get_kshingle_hashes(text: str) -> List[np.int32]:
     # cast hashvalues from uint64 to uint32
     hv = np.uint32(m.hashvalues)
     # cast to signed int32
-    hv = [ts.uint32_to_int32(i) for i in m.hashvalues]
+    hv = [ts.uint32_to_int32(i) for i in hv]
     return hv
 
 
