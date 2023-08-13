@@ -63,7 +63,6 @@ from .transform_emoji import (
 )
 
 from .transform_all import (
-    to_float,
     to_int,
     i2f,
     get_names

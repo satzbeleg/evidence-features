@@ -1,11 +1,9 @@
 from .transform_sbert import (
-    sbert_to_bool,
     sbert_to_int8,
     sbert_i2b,
     sbert_names
 )
 from .transform_trankit import (
-    trankit_to_float,
     trankit_to_int,
     trankit_names
 )
@@ -13,42 +11,34 @@ from .transform_kshingle import (
     kshingle_to_int32
 )
 from .transform_epitran import (
-    consonant_to_float,
     consonant_to_int16,
     consonant_names
 )
 from .transform_derechar import (
-    derechar_to_float,
     derechar_to_int16,
     derechar_names,
-    derebigram_to_float,
     derebigram_to_int16,
     derebigram_names
 )
 from .transform_cow import (
-    cow_to_float,
     cow_to_int8,
     cow_names
 )
 from .transform_smor import (
-    smor_to_float,
     smor_to_int8,
     smor_names
 )
 from .transform_seqlen import (
-    seqlen_to_float,
     seqlen_to_int16,
     seqlen_i2f,
     seqlen_names
 )
 from .transform_fasttext176 import (
-    fasttext176_to_float,
     fasttext176_to_int8,
     fasttext176_i2f,
     fasttext176_names
 )
 from .transform_emoji import (
-    emoji_to_float,
     emoji_to_int8,
     emoji_names
 )
@@ -65,28 +55,6 @@ import logging
 # start logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-
-def to_float(sentences: List[str],
-             masked: List[str] = None):
-    if masked is None:
-        feats1 = sbert_to_bool(sentences).astype(np.float32)
-    else:
-        feats1 = sbert_to_bool(masked).astype(np.float32)
-    feats2, feats3, feats4 = trankit_to_float(sentences)
-    feats5 = consonant_to_float(sentences)
-    feats6 = derechar_to_float(sentences)
-    feats7 = derebigram_to_float(sentences)
-    feats8 = cow_to_float(sentences)
-    feats9 = smor_to_float(sentences)
-    feats12 = seqlen_to_float(sentences)
-    feats13 = fasttext176_to_float(sentences)
-    feats14 = emoji_to_float(sentences)
-    return np.hstack([
-        feats1, feats2, feats3, feats4,
-        feats5, feats6, feats7, feats8,
-        feats9, feats12, feats13, feats14
-    ])
 
 
 def to_int(sentences: List[str],
