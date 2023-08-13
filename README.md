@@ -65,7 +65,7 @@ The software uses pretrained NLP models and statistics.
 
 ```sh
 # Ensure Debian packages are available
-sudo apt install unzip p7zip-full
+sudo apt install unzip p7zip p7zip-full
 
 # some python package are called
 conda activate gpu-venv-evidence-features
@@ -80,6 +80,8 @@ bash download-models.sh
 pytest
 # check time measurement
 python test/check_timer.py
+# run example
+python test/check_todisk.py
 ```
 
 ### Download via DVC Backend
@@ -182,6 +184,59 @@ i.e., the F1 scores are expected to decrease but not too much.
 |  ARCHI | 0.374 | 0.357 |
 |   LSDC | 0.396 | 0.406 |
 
+
+### Compute Scores with QUAXA
+
+```py
+import evidence_features as evf
+import json
+import quaxa
+
+sentences = [
+    "Dieser Satz ist ein Beispiel, aber eher kurz.",
+    "Die Kuh macht muh, der Hund wufft aber lauter."
+]
+
+(
+    feats1, feats2, feats3, feats4, feats5, feats6, feats7, feats8,
+    feats9, feats12, feats13, feats14, hashes15, hashes16,
+    sentences_sbd, lemmata17, spans, annotations
+) = evf.to_int(sentences, measure_time=True, sbert_masking=True)
+
+# convert `annotation` to conllu format
+def format_trankit_to_conllu(batch_annot):
+    batch_result = []
+    for annot in batch_annot:
+        result = []
+        for t in json.loads(annot):
+            tmp_feats = t.get("feats")
+            if isinstance(tmp_feats, str):
+                tmp_feats = {k: v for k, v in [f.split("=") for f in tmp_feats.split("|")]}
+            result.append({
+                "id": t.get("id"),
+                "form": t.get("text"),
+                "lemma": t.get("lemma"),
+                "upos": t.get("upos"),
+                "xpos": t.get("xpos"),
+                "feats": tmp_feats,
+                "head": t.get("head"),
+                "deprel": t.get("deprel"),
+                "deps": t.get("deps"),
+                "misc": t.get("misc"),
+                "span": t.get("span"),
+                "ner": t.get("ner")
+            })
+        batch_result.append(result)
+    return batch_result
+
+conll_annot = format_trankit_to_conllu(annotations)
+
+# quaxa
+for lemmas, sent, annot in zip(*(lemmata17, sentences_sbd, conll_annot)):
+    for headword in lemmas:
+        score = quaxa.total_score(headword=headword, txt=sent, annotation=annot)
+        print(score, headword, sent)
+```
 
 ## Appendix
 

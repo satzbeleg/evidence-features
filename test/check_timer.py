@@ -1,6 +1,5 @@
 import evidence_features as evf
 
-
 sentences = [
     "Dieser Satz ist ein Beispiel, aber eher kurz.",
     "Die Kuh macht muh, der Hund wufft aber lauter."

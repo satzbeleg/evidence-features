@@ -8,10 +8,39 @@ from .transform_sbert import sbert_i2b
 from .transform_kshingle import kshingle_to_int32
 import uuid
 import jsonlines
+import json
+import quaxa
 
 
 # start logger
 logger = logging.getLogger(__name__)
+
+
+# convert `annotation` to conllu format
+def format_trankit_to_conllu(batch_annot):
+    batch_result = []
+    for annot in batch_annot:
+        result = []
+        for t in json.loads(annot):
+            tmp_feats = t.get("feats")
+            if isinstance(tmp_feats, str):
+                tmp_feats = {k: v for k, v in [f.split("=") for f in tmp_feats.split("|")]}
+            result.append({
+                "id": t.get("id"),
+                "form": t.get("text"),
+                "lemma": t.get("lemma"),
+                "upos": t.get("upos"),
+                "xpos": t.get("xpos"),
+                "feats": tmp_feats,
+                "head": t.get("head"),
+                "deprel": t.get("deprel"),
+                "deps": t.get("deps"),
+                "misc": t.get("misc"),
+                "span": t.get("span"),
+                "ner": t.get("ner")
+            })
+        batch_result.append(result)
+    return batch_result
 
 
 def is_valid_uuid(val):
@@ -28,7 +57,7 @@ def encode_and_save(FILEPATH: str,
                     sent_ids: List[str] = None,
                     biblio: List[str] = None,
                     licensetext: List[str] = None,
-                    scores: List[float] = None,
+                    exclude_lowscores: bool = False,
                     document_level=False):
 
     # encode features
@@ -69,9 +98,8 @@ def encode_and_save(FILEPATH: str,
     elif licensetext is None:
         licensetext = [""] * len(sentences)
 
-    # check scores
-    if scores is None:
-        scores = [0.5] * len(sentences)
+    # convert trankit annotations to conllu
+    conll_annot = format_trankit_to_conllu(annot)
 
     # loop over each sentence
     all_items = []
@@ -89,10 +117,19 @@ def encode_and_save(FILEPATH: str,
         if len(l17[i]) == 0:
             logger.warning(f"Sentence has no VERB, NOUN, ADJ: '{text}'")
             j_mask += len(l17[i])
-            continue
+            continue        
 
         # save a row for each headword
         for k, headword in enumerate(l17[i]):
+            # compute QUAXA scores
+            score = quaxa.total_score(
+                headword=headword, txt=text, annotation=conll_annot[i])
+
+            # ignore low scores
+            if exclude_lowscores and score < 0.5:
+                j_mask += 1
+                continue
+
             # add line to list
             all_items.append({
                 'headword': headword,
@@ -103,7 +140,7 @@ def encode_and_save(FILEPATH: str,
                 'annot': annot[i],
                 'biblio': biblio[i],
                 'license': licensetext[i],
-                'score': scores[i],
+                'score': score,
                 'feats1': f1[j_mask].tolist(),  # masked embeddings!
                 'feats2': f2[i].tolist(),
                 'feats3': f3[i].tolist(),
